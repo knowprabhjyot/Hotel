@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -50,8 +50,9 @@ export default function SignInComponent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+
   const signIn = () => {
-        console.log(email, password);
+      console.log(email, password);
       history.push('/payments');
   }
 

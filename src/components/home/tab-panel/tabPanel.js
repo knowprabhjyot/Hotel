@@ -28,19 +28,22 @@ const navItems = [
         path: '/changepassword',
         text: 'Change Password',
     },
+    {
+        id: 'logout',
+        path: '/logout',
+        text: 'Logout',
+    },
 ];
 
 const TabPanelComponent = (props) => {
     const { pathname } = useLocation();
     const activeItem = navItems.find((item) => !!matchPath(pathname, { path: item.path }));
     return (
-        <div>
-            <Tabs value={activeItem?.id} orientation="vertical">
-                {navItems.map((item) => (
-                    <Tab fullWidth key={item.id} value={item.id} label={item.text} component={NavLink} to={item.path} />
-                ))}
-            </Tabs>
-        </div>
+        <Tabs value={activeItem?.id} orientation="vertical">
+            {navItems.map((item) => (
+                <Tab fullWidth key={item.id} value={item.id} label={item.text} component={NavLink} to={item.path} />
+            ))}
+        </Tabs>
     );
 }
 

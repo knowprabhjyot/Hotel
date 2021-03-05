@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Button, CircularProgress, Grid, makeStyles, Snackbar, TextField } from '@material-ui/core';
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { DateRangePicker } from "materialui-daterange-picker";
@@ -22,6 +22,7 @@ const PaymentsComponent = (props) => {
     const stripe = useStripe();
     const elements = useElements();
     const history = useHistory();
+    const [isLoggedIn, setLogin] = React.useState(false);
 
     const Alert = ((props) => {
         return <MuiAlert elevation={6} variant="filled" {...props} />;
