@@ -25,6 +25,7 @@ const App = (props) => {
   const [token, setToken] = useState(false);
   const [tokenExpirationDate, setTokenExpirationDate] = useState();
   const [userId, setUserId] = useState(false);
+  const history = useHistory();
   // const [isLoading, setIsloading] = useState(true);
 
   const login = useCallback((uid, token, expirationDate) => {
@@ -54,6 +55,8 @@ const App = (props) => {
     localStorage.removeItem('profileData');
     let token = null
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    history.push('/login');
+    alert('Successfully Logged out');
 
   }, []);
 

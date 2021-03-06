@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Tabs, Tab } from '@material-ui/core';
 import { matchPath, NavLink, useLocation, withRouter } from "react-router-dom";
+import { AuthContext } from '../../context/authContext';
 
 const navItems = [
     {
@@ -30,8 +31,15 @@ const navItems = [
     },
 ];
 
+
 const TabPanelComponent = (props) => {
     const { pathname } = useLocation();
+    const authContext = useContext(AuthContext);
+    
+    const logout = () => {
+        authContext.logout();
+    }
+
     const activeItem = navItems.find((item) => !!matchPath(pathname, { path: item.path }));
     return (
         <div>
@@ -39,6 +47,7 @@ const TabPanelComponent = (props) => {
                 {navItems.map((item) => (
                     <Tab fullWidth key={item.id} value={item.id} label={item.text} component={NavLink} to={item.path} />
                 ))}
+                <Tab key="logout" value="logout" label="Logout" onClick={logout} />
             </Tabs>
         </div>
     );
