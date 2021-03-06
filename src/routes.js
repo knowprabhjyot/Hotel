@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import ChangePasswordComponent from './components/home/change-password/change-password';
 import HistoryComponent from './components/home/history/history';
@@ -6,17 +6,32 @@ import RefundComponent from './components/home/refund/refund';
 import RequestPaymentComponent from './components/home/request-payment/requestPayment';
 import StripeComponent from './components/home/payments/stripe';
 import SignInComponent from './components/login/login';
+import PrivateRoute from './components/privateRoute';
+import { AuthContext } from './context/authContext';
 
 const Routes = () => {
+    const { isLoggedIn } = useContext(AuthContext);
+    console.log(isLoggedIn);
     return (
         <Switch>
-            <Redirect exact from="/" to="/login" />
-            <Route exact path="/payments" component={StripeComponent}></Route>
-            <Route exact path="/request" component={RequestPaymentComponent}></Route>
-            <Route exact path="/history" component={HistoryComponent}></Route>
-            <Route exact path="/refund" component={RefundComponent}></Route>
-            <Route exact path="/changepassword" component={ChangePasswordComponent}></Route>
-            <Route exact path="/login" component={SignInComponent}></Route>
+            <PrivateRoute path="/payments">
+                <StripeComponent />
+            </PrivateRoute>
+            <PrivateRoute path="/request">
+                <RequestPaymentComponent />
+            </PrivateRoute>
+            <PrivateRoute path="/history">
+                <HistoryComponent />
+            </PrivateRoute>
+            <PrivateRoute path="/refund">
+                <RefundComponent />
+            </PrivateRoute >
+            <PrivateRoute path="/changepassword">
+                <ChangePasswordComponent />
+            </PrivateRoute>
+            <Route path="/login">
+                <SignInComponent/>
+            </Route>
         </Switch>
     )
 }
