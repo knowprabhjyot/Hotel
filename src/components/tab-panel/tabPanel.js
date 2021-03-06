@@ -56,7 +56,9 @@ const TabPanelComponent = (props) => {
     const activeItem = navItems.find((item) => !!matchPath(pathname, { path: item.path }));
     return (
         <div>
-            <Tabs value={activeItem?.id} orientation="vertical">
+            <Tabs value={activeItem?.id} orientation="vertical" TabIndicatorProps={{
+           style: { background: "cyan",  }
+         }}>
                 {navItems.map((item) => (
                     <Tab fullWidth key={item.id} value={item.id} label={item.text} component={NavLink} to={item.path} />
                 ))}
