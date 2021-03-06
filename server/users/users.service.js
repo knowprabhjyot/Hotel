@@ -6,8 +6,9 @@ const bcrypt = require('bcrypt');
 module.exports = {
     authenticate,
     getAll,
-    getById,
-    createUser
+    // getById,
+    createUser,
+    deleteUser
 };
 
 async function authenticate(body) {
@@ -50,12 +51,18 @@ async function createUser(body) {
 
 }
 
+async function deleteUser(id) {
+    const result = await User.deleteOne({_id: id});
+    if (result) {
+        return result;
+    } else {
+        return null;
+    }
+}
+
 async function getAll() {
     const users = await User.find({});
-    return users.map(u => {
-        const { password, ...userWithoutPassword } = u;
-        return userWithoutPassword;
-    });
+    return users;
 }
 
 // async function getById(id) {

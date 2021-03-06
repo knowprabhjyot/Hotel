@@ -24,13 +24,18 @@ let logoutTimer;
 const App = (props) => {
   const [token, setToken] = useState(false);
   const [tokenExpirationDate, setTokenExpirationDate] = useState();
+  const [role, setRole] = useState(false);
   const [userId, setUserId] = useState(false);
   const history = useHistory();
   // const [isLoading, setIsloading] = useState(true);
 
-  const login = useCallback((uid, token, expirationDate) => {
+  const login = useCallback((uid,role, token, expirationDate) => {
     setToken(token);
     setUserId(uid);
+    console.log(role, 'in login');
+    if (role === 'admin') {
+      setRole(true);
+    }
     // setIsloading(false)
     const tokenExpirationDate =
       expirationDate || new Date(new Date().getTime() + 1000 * 60 * 60);
@@ -40,6 +45,7 @@ const App = (props) => {
       JSON.stringify({
         userId: uid,
         token: token,
+        role: role,
         expiration: tokenExpirationDate.toISOString()
       })
     );
@@ -51,6 +57,7 @@ const App = (props) => {
     setToken(null);
     setTokenExpirationDate(null);
     setUserId(null);
+    setRole(false);
     localStorage.removeItem('userData');
     localStorage.removeItem('profileData');
     let token = null
@@ -75,9 +82,10 @@ const App = (props) => {
     if (
       storedData &&
       storedData.token &&
+      storedData.role &&
       new Date(storedData.expiration) > new Date()
     ) {
-      login(storedData.userId, storedData.token, new Date(storedData.expiration));
+      login(storedData.userId,storedData.role, storedData.token, new Date(storedData.expiration));
     }
   }, [login]);
 
@@ -88,6 +96,7 @@ const App = (props) => {
       isLoggedIn: !!token,
       token: token,
       userId: userId,
+      admin: role,
       login: login,
       logout: logout
     }}

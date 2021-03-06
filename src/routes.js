@@ -6,12 +6,12 @@ import RefundComponent from './components/home/refund/refund';
 import RequestPaymentComponent from './components/home/request-payment/requestPayment';
 import StripeComponent from './components/home/payments/stripe';
 import SignInComponent from './components/login/login';
+import ManageUsersComponent from './components/home/manage-users/manage-users';
 import PrivateRoute from './components/privateRoute';
 import { AuthContext } from './context/authContext';
 
 const Routes = () => {
-    const { isLoggedIn } = useContext(AuthContext);
-    console.log(isLoggedIn);
+    const { admin } = useContext(AuthContext);
     return (
         <Switch>
             <PrivateRoute path="/payments">
@@ -32,6 +32,7 @@ const Routes = () => {
             <Route path="/login">
                 <SignInComponent/>
             </Route>
+            { admin ? <PrivateRoute path="/manage-users" ><ManageUsersComponent /> </PrivateRoute> : <Redirect to="/login" />}
         </Switch>
     )
 }

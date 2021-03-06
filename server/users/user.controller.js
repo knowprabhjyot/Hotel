@@ -9,6 +9,7 @@ router.post('/login', authenticate);     // public route
 router.get('/', authorize(Role.ADMIN), getAll); // admin only
 router.post('/signup', authorize(Role.ADMIN), createUser); // admin only
 router.get('/:id', authorize(), getById);       // all authenticated users
+router.delete('/:id', authorize(Role.ADMIN), deleteUser);
 module.exports = router;
 
 function authenticate(req, res, next) {
@@ -24,10 +25,15 @@ function getAll(req, res, next) {
 }
 
 function createUser(req, res, next) {
-    req.body.role = 'admin';
     console.log(req.body, 'REQ BODY');
     userService.createUser(req.body)
         .then(user => user ? res.json(user) : res.status(400).json({message: 'User Already Exists'}))
+        .catch(err => next(err));
+}
+
+function deleteUser(req, res, next) {
+        userService.deleteUser(req.params.id)
+        .then(response => response ? res.status(200).json(response) : res.status(400).json({message: 'Something Went Wrong'}))
         .catch(err => next(err));
 }
 

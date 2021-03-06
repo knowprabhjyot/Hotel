@@ -25,6 +25,11 @@ const navItems = [
         text: 'History',
     },
     {
+        id: 'manage-users',
+        path: '/manage-users',
+        text: 'Manage Users',
+    },
+    {
         id: 'changepassword',
         path: '/changepassword',
         text: 'Change Password',
@@ -35,11 +40,19 @@ const navItems = [
 const TabPanelComponent = (props) => {
     const { pathname } = useLocation();
     const authContext = useContext(AuthContext);
-    
     const logout = () => {
         authContext.logout();
     }
 
+    console.log(authContext);
+
+    if (!authContext.admin) {
+        const index = navItems.findIndex((item) => item.id === 'manage-users' );
+        if (index > -1) {
+            navItems.splice(index, 1);
+        }
+    }
+    console.log(navItems);
     const activeItem = navItems.find((item) => !!matchPath(pathname, { path: item.path }));
     return (
         <div>

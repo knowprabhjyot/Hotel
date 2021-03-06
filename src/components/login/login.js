@@ -59,11 +59,11 @@ export default function SignInComponent() {
       e.preventDefault();
       const data = {email, password};
       try {
-        const response = await axios.post('http://localhost:5000/auth/login', data);
+        const response = await axios.post('http://localhost:5000/users/login', data);
         if (response) {
             console.log(response, 'response');
             history.push('/payments');
-            authContext.login(response.data.userId, response.data.token);
+            authContext.login(response.data.user._id,response.data.user.role, response.data.token);
         }
       } catch(error) {
           alert(error.response.data.message);
