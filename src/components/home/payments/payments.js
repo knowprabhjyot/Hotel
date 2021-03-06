@@ -75,10 +75,8 @@ const PaymentsComponent = (props) => {
             const { id } = paymentMethod;
 
             try {
-                await CompletePayment(data, id);
-                setTimeout(() => {
-                    history.push('/history');
-                }, 1000);
+                const response = await CompletePayment(data, id);
+                history.push('/history');
             } catch (error) {
                 console.log(error);
             }

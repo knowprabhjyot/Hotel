@@ -66,7 +66,7 @@ export default function SignInComponent() {
             authContext.login(response.data.userId, response.data.token);
         }
       } catch(error) {
-        //   alert(error.response.data.message);
+          alert(error.response.data.message);
           console.log(error.response, 'message');
       }
 

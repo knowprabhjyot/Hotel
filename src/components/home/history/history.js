@@ -33,9 +33,10 @@ const HistoryComponent = () => {
         { id: 'name', label: 'Name' },
         { id: 'email', label: 'Email' },
         { id: 'contact', label: 'Contact' },
-        { id: 'checkin', label: 'CheckIn' },
-        { id: 'checkout', label: 'CheckOut' },
+        { id: 'checkIn', label: 'CheckIn' },
+        { id: 'checkOut', label: 'CheckOut' },
         { id: 'amount', label: 'Amount' },
+        { id: 'receipt', label: 'Receipt'}
     ];
 
     const getPaymentHistory = async () => {
@@ -80,6 +81,9 @@ const HistoryComponent = () => {
                                                     </TableCell>
                                                 );
                                             })}
+                                            <TableCell>
+                                                <a href={row.receipt_url} target="_blank">Receipt</a>
+                                            </TableCell>
                                         </TableRow>
                                     );
                                 })}

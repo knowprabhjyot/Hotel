@@ -20,6 +20,15 @@ router.post('/', async (req, res) => {
 
     const payment = await stripe.paymentIntents.create({
         amount: data.amount,
+        metadata: {
+            checkIn: data.checkIn,
+            checkOut: data.checkOut,
+            email: data.email,
+            name: data.name,
+            contact: data.contact
+        },
+        receipt_email: data.email,
+        customer: customer.id,
         shipping: {
             name: data.name,
             address: {
@@ -37,20 +46,24 @@ router.post('/', async (req, res) => {
     });
 
     if (!payment.error) {
-        const newPayment = new Payments(data);
-        newPayment.save((error) => {
-            if (error) {
-                console.log('Oops something went wrong');
-                return res.status(500).json({
-                    error: error,
-                    message: error.message
-                })
-            } else {
-                console.log('Payment Successful');
-                return res.status(201).json({
-                    message: 'Payment Successful'
-                })
-            }
+        // const newPayment = new Payments(data);
+        // newPayment.save((error) => {
+        //     if (error) {
+        //         console.log('Oops something went wrong');
+        //         return res.status(500).json({
+        //             error: error,
+        //             message: error.message
+        //         })
+        //     } else {
+        //         console.log('Payment Successful');
+        //         return res.status(201).json({
+        //             message: 'Payment Successful'
+        //         })
+        //     }
+        // })
+        res.status(200).json({
+            data: payment.charges.data[0].receipt_url,
+            message: 'Payment Succesful'
         })
     } else {
         return res.status(500).json({
@@ -60,14 +73,15 @@ router.post('/', async (req, res) => {
     }
 });
 
-
 router.get('/', async (req, res) => {
     try {
-        const response = await Payments.find({});
-        console.log(response);
+        const paymentHistory = await stripe.paymentIntents.list({});
+        const paymentData = (paymentHistory.data.map((item) => {
+            return {name: item.metadata.name, amount: item.amount, checkIn: item.metadata.checkIn, checkOut: item.metadata.checkOut, contact: item.metadata.contact, email: item.metadata.email, receipt_url: item.charges.data[0].receipt_url}
+        }));
         return res.status(200).json({
-            message: 'Fetched Data Successfully',
-            data: response
+            message: 'Fetched Payment History Successfully',
+            data: paymentData
         })
     } catch(error) {
         return res.status(500).json({
