@@ -1,4 +1,4 @@
-import { Box, createMuiTheme, Grid, makeStyles, Snackbar, ThemeProvider } from '@material-ui/core';
+import { Box, createMuiTheme, Grid, Hidden, makeStyles, Snackbar, ThemeProvider } from '@material-ui/core';
 import { blueGrey, red } from '@material-ui/core/colors';
 import Routes from './routes';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -33,7 +33,8 @@ const useStyles = makeStyles({
   },
   logo: {
     width: '100%',
-    height: '100px'
+    height: '100px',
+    padding: '8px'
   }
 });
 
@@ -144,17 +145,17 @@ const App = (props) => {
             </Alert>
           </Snackbar>
         <Grid container>
-        <Grid item xs={2}>
+        <Grid item xs={3} sm={2}>
           <Box display="flex" alignItems>
             {token ? 
             <Box display="flex" flexDirection="column">
-              <img className={classes.logo} src="../assets/images/logo.png" alt="logo" />
+               <img className={classes.logo} src="../assets/images/logo.png" alt="logo" />
               <TabPanelComponent />
             </Box>
             : null}
           </Box>
           </Grid>
-          <Grid item xs={!token ? 12 : 10} >
+          <Grid item xs={!token ? 12 : 9} sm={!token ? 12 : 10}  >
             <Box marginTop="100px" display="flex" justifyContent="center" alignItems="center" >
             { token ? <Redirect exact from="/" to="/payments" /> : <Redirect exact from="/" to="/login" />}
               <Routes />
