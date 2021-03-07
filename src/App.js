@@ -1,4 +1,4 @@
-import { Box, createMuiTheme, Grid, Snackbar, ThemeProvider } from '@material-ui/core';
+import { Box, createMuiTheme, Grid, makeStyles, Snackbar, ThemeProvider } from '@material-ui/core';
 import { green, purple } from '@material-ui/core/colors';
 import Routes from './routes';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -27,8 +27,18 @@ const Alert = ((props) => {
 });
 
 
+const useStyles = makeStyles({
+  logoContainer: {
+    margin: '16px 0px' 
+  },
+  logo: {
+    width: '100%',
+    height: '100px'
+  }
+});
 
 const App = (props) => {
+  const classes = useStyles();
   const [token, setToken] = useState(false);
   const [tokenExpirationDate, setTokenExpirationDate] = useState();
   const [role, setRole] = useState(false);
@@ -134,17 +144,18 @@ const App = (props) => {
             </Alert>
           </Snackbar>
         <Grid container>
-          <Grid item lg={2}>
-            { token ?  <Box display="flex" justifyContent="center">
-              <h1>Your Logo</h1>
-            </Box> : null}
+        <Grid item xs={2}>
+          <Box display="flex" alignItems>
+            {token ? 
+            <Box display="flex" flexDirection="column">
+              <img className={classes.logo} src="../assets/images/logo.png" alt="logo" />
+              <TabPanelComponent />
+            </Box>
+            : null}
+          </Box>
           </Grid>
-          <Grid item lg={12}></Grid>
-          <Grid item lg={2}>
-            {token ? <TabPanelComponent /> : null}
-          </Grid>
-          <Grid item lg={!token ? 12 : 10}>
-            <Box display="flex" justifyContent="center" alignItems="center">
+          <Grid item xs={!token ? 12 : 10} >
+            <Box marginTop="100px" display="flex" justifyContent="center" alignItems="center" >
             { token ? <Redirect exact from="/" to="/payments" /> : <Redirect exact from="/" to="/login" />}
               <Routes />
             </Box>

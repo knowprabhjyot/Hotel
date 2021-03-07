@@ -1,10 +1,10 @@
-import { Box, Grid, makeStyles, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow } from '@material-ui/core';
+import { Box, Grid, makeStyles, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow } from '@material-ui/core';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 
 const HistoryComponent = () => {
     const [paymentHistory, setPaymentHistory] = useState([]);
-    useEffect( () => {
+    useEffect(() => {
         getPaymentHistory();
         // eslint-disable-next-line
     }, []);
@@ -36,7 +36,7 @@ const HistoryComponent = () => {
         { id: 'checkIn', label: 'CheckIn' },
         { id: 'checkOut', label: 'CheckOut' },
         { id: 'amount', label: 'Amount' },
-        { id: 'receipt', label: 'Receipt'}
+        { id: 'receipt', label: 'Receipt' }
     ];
 
     const getPaymentHistory = async () => {
@@ -52,59 +52,62 @@ const HistoryComponent = () => {
         }
     }
     return (
-        <Grid container>
-            <Box display="flex" flexDirection="column" className={classes.root}>
-                <Grid item>
-                    <TableContainer className={classes.container}>
-                        <Table stickyHeader aria-label="sticky table">
-                            <TableHead>
-                                <TableRow>
-                                    {columns.map((column) => (
-                                        <TableCell
-                                            key={column.id}
-                                            align={column.align}
-                                        >
-                                            {column.label}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {paymentHistory.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                                    return (
-                                        <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
-                                            {columns.map((column) => {
-                                                const value = row[column.id];
-                                                return (
-                                                    <TableCell key={column.id} align={column.align}>
-                                                        {column.format && typeof value === 'number' ? column.format(value) : value}
-                                                    </TableCell>
-                                                );
-                                            })}
-                                            <TableCell>
-                                                <a href={row.receipt_url} target="_blank">Receipt</a>
-                                            </TableCell>
+        <Box display="flex" width="80%">
+            <Grid container>
+                <Box display="flex" flexDirection="column" className={classes.root}>
+                    <Paper>
+                        <Grid item>
+                            <TableContainer className={classes.container}>
+                                <Table stickyHeader aria-label="sticky table">
+                                    <TableHead>
+                                        <TableRow>
+                                            {columns.map((column) => (
+                                                <TableCell
+                                                    key={column.id}
+                                                    align={column.align}
+                                                >
+                                                    {column.label}
+                                                </TableCell>
+                                            ))}
                                         </TableRow>
-                                    );
-                                })}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </Grid>
-                <Grid item>
-                    <TablePagination
-
-                        rowsPerPageOptions={[10, 25, 100]}
-                        component="div"
-                        count={paymentHistory.length}
-                        rowsPerPage={rowsPerPage}
-                        page={page}
-                        onChangePage={handleChangePage}
-                        onChangeRowsPerPage={handleChangeRowsPerPage}
-                    />
-                </Grid>
-            </Box>
-        </Grid>
+                                    </TableHead>
+                                    <TableBody>
+                                        {paymentHistory.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                                            return (
+                                                <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
+                                                    {columns.map((column) => {
+                                                        const value = row[column.id];
+                                                        return (
+                                                            <TableCell key={column.id} align={column.align}>
+                                                                {column.format && typeof value === 'number' ? column.format(value) : value}
+                                                            </TableCell>
+                                                        );
+                                                    })}
+                                                    <TableCell>
+                                                        <a href={row.receipt_url} target="_blank">Receipt</a>
+                                                    </TableCell>
+                                                </TableRow>
+                                            );
+                                        })}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        </Grid>
+                        <Grid item>
+                            <TablePagination
+                                rowsPerPageOptions={[10, 25, 100]}
+                                component="div"
+                                count={paymentHistory.length}
+                                rowsPerPage={rowsPerPage}
+                                page={page}
+                                onChangePage={handleChangePage}
+                                onChangeRowsPerPage={handleChangeRowsPerPage}
+                            />
+                        </Grid>
+                    </Paper>
+                </Box>
+            </Grid>
+        </Box>
 
     )
 }

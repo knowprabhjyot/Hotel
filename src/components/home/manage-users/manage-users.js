@@ -8,7 +8,7 @@ import CreateUserComponent from './create-user/create-user';
 const columns = [
   { field: 'id', headerName: 'id', width: 400 },
   { field: 'email', headerName: 'Email', width: 400 },
-  { field: 'role', headerName: 'Role', width: 400 },
+  { field: 'role', headerName: 'Role' },
 ];
 
 
@@ -68,20 +68,23 @@ export default function ManageUsersComponent() {
   }
 
   return (
-    <div style={{ height: 400, width: '100%' }}>
-      <Box display="flex" justifyContent="space-between">
-        <CreateUserComponent />
-      { selectedUser ? <Button
-        variant="contained"
-        color="primary"
-        onClick={() => deleteUser(selectedUser)}
-        className={classes.button}
-        startIcon={<DeleteIcon />}
-      >
-        Delete
+    <Box display="flex" width="100%" justifyContent="center">
+      <Box display="flex" flexDirection="column" height="400" width="80%">
+        <Box display="flex" justifyContent="space-between">
+          <CreateUserComponent />
+          {selectedUser ? <Button
+            variant="contained"
+            color="primary"
+            onClick={() => deleteUser(selectedUser)}
+            className={classes.button}
+            startIcon={<DeleteIcon />}
+          >
+            Delete
       </Button> : null}
+        </Box>
+        <DataGrid autoHeight onRowSelected={selectUserList} rows={usersList} columns={columns} pageSize={5} />
       </Box>
-      <DataGrid autoHeight onRowSelected={selectUserList} rows={usersList} columns={columns} pageSize={5} />
-    </div>
+    </Box>
+
   );
 }

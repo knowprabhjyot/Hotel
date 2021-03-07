@@ -13,14 +13,14 @@ import { useHistory } from 'react-router';
 import axios from 'axios';
 import { AuthContext } from '../../context/authContext';
 import MuiAlert from '@material-ui/lab/Alert';
-import { Snackbar } from '@material-ui/core';
+import { Paper, Snackbar } from '@material-ui/core';
 
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
       <Link color="inherit" href="https://material-ui.com/">
-        Your Website
+        Big payment Solutions
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -35,6 +35,10 @@ const Alert = ((props) => {
 
 
 const useStyles = makeStyles((theme) => ({
+  container: {
+    border: `1px solid green`,
+    borderRadius: '16px',
+  },
   paper: {
     marginTop: theme.spacing(8),
     display: 'flex',
@@ -93,6 +97,7 @@ export default function SignInComponent() {
   };
 
   return (
+    <Paper>
     <Container component="main" maxWidth="xs">
       <Snackbar open={open} autoHideDuration={3000} onClose={handleClose}>
         <Alert onClose={handleClose} severity={severity}>
@@ -101,9 +106,9 @@ export default function SignInComponent() {
       </Snackbar>
       <CssBaseline />
       <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
-        </Avatar>
+        <Box width="250px" height="100">
+          <img src="../assets/images/logo.png" alt="logo" style={{width: '100%', height: '100%'}} />
+        </Box>
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
@@ -156,9 +161,10 @@ export default function SignInComponent() {
           </Grid> */}
         </form>
       </div>
-      <Box mt={8}>
+      <Box mt={2} mb={2}>
         <Copyright />
       </Box>
     </Container>
+    </Paper>
   );
 }
