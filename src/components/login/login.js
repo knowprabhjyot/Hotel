@@ -19,7 +19,7 @@ function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
+      <Link color="inherit">
         Big payment Solutions
       </Link>{' '}
       {new Date().getFullYear()}
@@ -116,6 +116,7 @@ export default function SignInComponent() {
           <TextField
             variant="outlined"
             margin="normal"
+            color="secondary"
             required
             type="email"
             fullWidth
@@ -129,6 +130,7 @@ export default function SignInComponent() {
           <TextField
             variant="outlined"
             margin="normal"
+            color="secondary"
             required
             fullWidth
             name="password"
@@ -142,7 +144,7 @@ export default function SignInComponent() {
             type="submit"
             fullWidth
             variant="contained"
-            color="primary"
+            color="secondary"
             className={classes.submit}
           >
             Sign In
