@@ -1,4 +1,4 @@
-import { Box, createMuiTheme, Grid, ThemeProvider } from '@material-ui/core';
+import { Box, createMuiTheme, Grid, Snackbar, ThemeProvider } from '@material-ui/core';
 import { green, purple } from '@material-ui/core/colors';
 import Routes from './routes';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -7,6 +7,7 @@ import TabPanelComponent from './components/tab-panel/tabPanel';
 import { Redirect, useHistory, useLocation } from 'react-router';
 import axios from 'axios';
 import { AuthContext } from './context/authContext';
+import MuiAlert from '@material-ui/lab/Alert';
 
 const theme = createMuiTheme({
   palette: {
@@ -21,12 +22,23 @@ const theme = createMuiTheme({
 
 let logoutTimer;
 
+const Alert = ((props) => {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+});
+
+
+
 const App = (props) => {
   const [token, setToken] = useState(false);
   const [tokenExpirationDate, setTokenExpirationDate] = useState();
   const [role, setRole] = useState(false);
   const [userId, setUserId] = useState(false);
   const history = useHistory();
+  const [open, setOpen] = React.useState(false);
+  const [severity, setSeverity] = useState('success');
+  const [message, setMessage] = useState('');
+
+  
   // const [isLoading, setIsloading] = useState(true);
 
   const login = useCallback((uid,role, token, expirationDate) => {
@@ -49,6 +61,9 @@ const App = (props) => {
         expiration: tokenExpirationDate.toISOString()
       })
     );
+    setOpen(true);
+    setSeverity('success');
+    setMessage('Successfully logged in');
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
   }, []);
@@ -61,9 +76,11 @@ const App = (props) => {
     localStorage.removeItem('userData');
     localStorage.removeItem('profileData');
     let token = null
+    setOpen(true);
+    setSeverity('success');
+    setMessage('Successfully logged out');
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     history.push('/login');
-    alert('Successfully Logged out');
 
   }, []);
 
@@ -89,6 +106,14 @@ const App = (props) => {
     }
   }, [login]);
 
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
+  };
+
 
   return (
     <AuthContext.Provider
@@ -103,6 +128,11 @@ const App = (props) => {
   >
     <ThemeProvider theme={theme}>
       <Box style={{ height: '100vh' }}>
+          <Snackbar open={open} autoHideDuration={3000} onClose={handleClose}>
+            <Alert onClose={handleClose} severity={severity}>
+              {message}
+            </Alert>
+          </Snackbar>
         <Grid container>
           <Grid item lg={2}>
             { token ?  <Box display="flex" justifyContent="center">

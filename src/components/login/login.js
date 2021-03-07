@@ -12,6 +12,8 @@ import Container from '@material-ui/core/Container';
 import { useHistory } from 'react-router';
 import axios from 'axios';
 import { AuthContext } from '../../context/authContext';
+import MuiAlert from '@material-ui/lab/Alert';
+import { Snackbar } from '@material-ui/core';
 
 function Copyright() {
   return (
@@ -25,6 +27,10 @@ function Copyright() {
     </Typography>
   );
 }
+
+const Alert = ((props) => {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+});
 
 
 
@@ -53,27 +59,46 @@ export default function SignInComponent() {
   const history = useHistory();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [message, setMessage] = useState('');
   const authContext  = useContext(AuthContext);
+  const [open, setOpen] = React.useState(false);
+  const [severity, setSeverity] = useState('success');
 
+  
   const signIn = async (e) => {
       e.preventDefault();
       const data = {email, password};
       try {
         const response = await axios.post('http://localhost:5000/users/login', data);
         if (response) {
-            console.log(response, 'response');
-            history.push('/payments');
-            authContext.login(response.data.user._id,response.data.user.role, response.data.token);
+            setTimeout(() => {
+              history.push('/payments');
+              authContext.login(response.data.user._id,response.data.user.role, response.data.token);
+            }, 1000);
         }
       } catch(error) {
-          alert(error.response.data.message);
-          console.log(error.response, 'message');
+        setSeverity('error');
+        setOpen(true);
+        setMessage(error.response.data.message);
       }
-
   }
+
+  
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
+  };
 
   return (
     <Container component="main" maxWidth="xs">
+      <Snackbar open={open} autoHideDuration={3000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity={severity}>
+          {message}
+        </Alert>
+      </Snackbar>
       <CssBaseline />
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>
