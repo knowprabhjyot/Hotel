@@ -5,7 +5,6 @@ const authorize = require('../helpers/authorize')
 const Role = require('../helpers/role');
 
 // routes
-router.post('/login', authenticate);     // public route
 router.get('/', authorize(Role.ADMIN), getAll); // admin only
 router.post('/signup', authorize(Role.ADMIN), createUser); // admin only
 router.get('/:id', authorize(), getById);       // all authenticated users
@@ -15,10 +14,7 @@ module.exports = router;
 function authenticate(req, res, next) {
     userService.authenticate(req.body)
         .then(user => user ? res.json(user) : res.status(400).json({ message: 'Username or password is incorrect' }))
-        .catch((error) => {
-            res.status(500).json({message: error.message})
-            next(error);
-        });
+        .catch(err => next(err));
 }
 
 function getAll(req, res, next) {

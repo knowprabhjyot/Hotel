@@ -22,6 +22,8 @@ const PaymentSchema = new Schema({
         type: String,
         required: true
     },
+    hotel: { type: mongoose.Schema.Types.ObjectId, ref: 'Hotel'},
+    user: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     contact: {
         type: Number,
         required: true

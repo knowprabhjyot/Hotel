@@ -2,9 +2,11 @@ const express  = require('express');
 const mongoose = require('mongoose');
 const app = express();
 const cors = require('cors');
-const paymentRoutes = require('./routes/payments');
+require('dotenv').config();
+// const paymentRoutes = require('./routes/payments');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./users/user.controller');
+const paymentRoutes = require('./payments/payments.controller');
 const PORT = process.env.PORT || 5000;
 const validateUser = require('./auth');
 

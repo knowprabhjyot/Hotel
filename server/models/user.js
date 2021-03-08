@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
-
 const User = mongoose.model('User', {
+    name: {
+        type: String
+    },
     email: {
         type: String,
         required: true,
@@ -12,6 +14,10 @@ const User = mongoose.model('User', {
     },
     role: {
         type: String,
+        required: true
+    },
+    hotels: {
+        type: [{type: mongoose.Schema.Types.ObjectId, ref: 'Hotel'}],
         required: true
     }
 });
