@@ -65,6 +65,10 @@ export default function ManageUsersComponent() {
           return response;
         }
       } catch (error) {
+        setLoading(false);
+        setMessage(error.message);
+        setSeverity('error');
+        setOpen(true);
         console.log(error);
       }
     }
