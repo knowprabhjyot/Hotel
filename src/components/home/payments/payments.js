@@ -125,12 +125,21 @@ const PaymentsComponent = (props) => {
         }
     }
 
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+          return;
+        }
+    
+        setOpen(false);
+      };
+    
+
     return (
         <Box display="grid" gridGap="32px" width="80%">
             <Paper className={classes.paper}>
             <form className={classes.form} onSubmit={HandleSubmit}>
-                <Snackbar open={open} autoHideDuration={2000} >
-                    <Alert severity={severity}>
+                <Snackbar onClose={handleClose} open={open} autoHideDuration={2000} >
+                    <Alert onClose={handleClose} severity={severity}>
                         {message}
                     </Alert>
                 </Snackbar>
