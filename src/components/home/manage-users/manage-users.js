@@ -59,6 +59,10 @@ export default function ManageUsersComponent() {
           const index = usersList.findIndex((item) => item.id === id);
           if (index > 0) {
             usersList.splice(index, 1);
+            setMessage('Delete user succesfully');
+            setSeverity('success');
+            getUsersList();
+            setOpen(true);
             setUsersList(usersList);
             setSelectedUser(null);
           }

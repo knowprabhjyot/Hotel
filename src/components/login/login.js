@@ -13,7 +13,7 @@ import { useHistory } from 'react-router';
 import axios from 'axios';
 import { AuthContext } from '../../context/authContext';
 import MuiAlert from '@material-ui/lab/Alert';
-import { Paper, Snackbar } from '@material-ui/core';
+import { CircularProgress, Paper, Snackbar } from '@material-ui/core';
 
 function Copyright() {
   return (
@@ -64,18 +64,21 @@ export default function SignInComponent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const [disabled, setDisabled]= useState(false);
   const authContext  = useContext(AuthContext);
   const [open, setOpen] = React.useState(false);
   const [severity, setSeverity] = useState('success');
 
   
   const signIn = async (e) => {
+      setDisabled(true);
       e.preventDefault();
       const data = {email, password};
       try {
         const response = await axios.post('http://localhost:5000/users/login', data);
         if (response) {
             setTimeout(() => {
+              setDisabled(false);
               history.push('/payments');
               authContext.login(response.data.user._id,response.data.user.role, response.data.token);
             }, 1000);
@@ -84,6 +87,7 @@ export default function SignInComponent() {
         setSeverity('error');
         setOpen(true);
         setMessage(error.response.data.message);
+        setDisabled(false);
       }
   }
 
@@ -120,6 +124,7 @@ export default function SignInComponent() {
             required
             type="email"
             fullWidth
+            disabled={disabled}
             id="email"
             label="Email Address"
             name="email"
@@ -133,6 +138,7 @@ export default function SignInComponent() {
             color="secondary"
             required
             fullWidth
+            disabled={disabled}
             name="password"
             label="Password"
             onChange={ (e) => setPassword(e.target.value)}
@@ -147,6 +153,9 @@ export default function SignInComponent() {
             color="secondary"
             className={classes.submit}
           >
+             <span style={{ marginRight: '8px' }}>
+                {(disabled) ? <CircularProgress size={20} /> : null}
+              </span>
             Sign In
           </Button>
           {/* <Grid container>
