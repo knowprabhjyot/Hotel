@@ -13,6 +13,7 @@ import MuiAlert from '@material-ui/lab/Alert';
 export default function CreateUserComponent() {
   const [openDialog, setOpenDialog] = React.useState(false);
   const [email, setEmail] = React.useState('');
+  const [name, setName] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [role, setRole] = React.useState('');
   const [open, setOpen] = React.useState(false);
@@ -52,7 +53,8 @@ export default function CreateUserComponent() {
       const response = await axios.post('http://localhost:5000/users/signup', {
         email,
         password,
-        role
+        role,
+        name
       });
       if (response) {
         // setUsersList(newUsersList);
@@ -65,15 +67,17 @@ export default function CreateUserComponent() {
         handleCloseDialog();
       }
     } catch (error) {
+      console.log(error, 'error');
       setLoading(false);
       setDisabled(false);
-      setMessage(error.response.data.message);
+      (error.response.data.message) ? setMessage(error.response.data.message) : setMessage('Something went wrong');
       setSeverity('error');
       setOpen(true);
       handleCloseDialog();
     }
     setEmail('');
-    setPassword('');
+    setPassword('');  
+    setName('');
     setRole('');
   }
 
@@ -96,11 +100,25 @@ export default function CreateUserComponent() {
           <DialogContentText>
             You can Create a user with basic details
           </DialogContentText>
-        <TextField
+          <TextField
             autoFocus
             variant="outlined"
             margin="normal"
             id="name"
+            disabled={disabled}
+            color="secondary"
+            label="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            type="text"
+            required
+            fullWidth
+          />
+        <TextField
+            autoFocus
+            variant="outlined"
+            margin="normal"
+            id="email"
             disabled={disabled}
             color="secondary"
             label="Email Address"

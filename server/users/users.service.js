@@ -32,6 +32,7 @@ async function createUser(body) {
     const hash = bcrypt.hashSync(body.password, 10);
     const user = new User({
         email: body.email,
+        name: body.name,
         password: hash,
         role: body.role
     });
@@ -54,7 +55,7 @@ async function createUser(body) {
 async function deleteUser(id) {
     const result = await User.deleteOne({_id: id});
     if (result) {
-        return result;
+        return true;
     } else {
         return null;
     }

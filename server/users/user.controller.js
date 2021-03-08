@@ -28,7 +28,6 @@ function getAll(req, res, next) {
 }
 
 function createUser(req, res, next) {
-    console.log(req.body, 'REQ BODY');
     userService.createUser(req.body)
         .then(user => user ? res.json(user) : res.status(400).json({message: 'User Already Exists'}))
         .catch(err => next(err));
