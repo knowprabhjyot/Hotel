@@ -1,15 +1,22 @@
-import { Box, Grid, makeStyles, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow } from '@material-ui/core';
+import { Box, CircularProgress, Grid, makeStyles, Paper, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow } from '@material-ui/core';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import MuiAlert from '@material-ui/lab/Alert';
 
 const HistoryComponent = () => {
     const [paymentHistory, setPaymentHistory] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [open, setOpen] = React.useState(false);
+    const [message, setMessage] = React.useState('');
+    const [severity, setSeverity] = React.useState('success');
+    const [page, setPage] = React.useState(0);
+    const [rowsPerPage, setRowsPerPage] = React.useState(10);
+
     useEffect(() => {
         getPaymentHistory();
         // eslint-disable-next-line
     }, []);
-    const [page, setPage] = React.useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(10);
+
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -39,20 +46,50 @@ const HistoryComponent = () => {
     ];
 
     const getPaymentHistory = async () => {
+        setLoading(true);
         try {
             const response = await axios.get('http://localhost:5000/payments');
             if (response) {
                 setPaymentHistory(response.data.data);
                 console.log(paymentHistory, 'value');
+                setMessage(response.data.message);
+                setSeverity('success');
+                setOpen(true);
+                setLoading(false);
                 return response;
             }
         } catch (error) {
+            setLoading(false);
+            setMessage(error.message);
+            setSeverity('error');
+            setOpen(true);
             console.log(error);
         }
     }
+
+    const Alert = ((props) => {
+        return <MuiAlert elevation={6} variant="filled" {...props} />;
+    });
+
+
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+          return;
+        }
+    
+        setOpen(false);
+      };
+    
+
     return (
-        <Box display="flex" width="80%">
-            <Grid container>
+        <Box display="flex" width="80%" justifyContent="center" alignItems="center" height="100%">
+            <Snackbar open={open} autoHideDuration={2000} onClose={handleClose} >
+                <Alert onClose={handleClose} severity={severity}>
+                    {message}
+                </Alert>
+            </Snackbar>
+            { loading ? <CircularProgress color="secondary" /> : null}
+            { !loading ? <Grid container>
                 <Box display="flex" flexDirection="column" className={classes.root}>
                     <Paper>
                         <Grid item>
@@ -102,8 +139,8 @@ const HistoryComponent = () => {
                         </Grid>
                     </Paper>
                 </Box>
-            </Grid>
-        </Box>
+            </Grid> : null }
+        </Box> 
 
     )
 }

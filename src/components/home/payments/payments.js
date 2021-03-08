@@ -92,9 +92,6 @@ const PaymentsComponent = (props) => {
             setDisable(false);
             setSeverity('error');
         }
-        setTimeout(() => {
-            setOpen(false);
-        }, 1000);
     };
 
     const classes = useStyles();

@@ -158,7 +158,7 @@ const App = (props) => {
           </Box>
           </Grid>
           <Grid item xs={!token ? 12 : 9} sm={!token ? 12 : 10}  >
-            <Box width="100%" marginTop="100px" display="flex" justifyContent="center" alignItems="center" >
+            <Box width="100%" height="100%" marginTop="50px" display="flex" justifyContent="center" alignItems="center" >
             { token ? <Redirect exact from="/" to="/payments" /> : <Redirect exact from="/" to="/login" />}
               <Routes />
             </Box>
