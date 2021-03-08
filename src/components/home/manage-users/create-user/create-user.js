@@ -6,24 +6,47 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { Box, FormControlLabel, Radio, RadioGroup } from '@material-ui/core';
+import { Box, CircularProgress, FormControlLabel, Radio, RadioGroup, Snackbar } from '@material-ui/core';
 import axios from 'axios';
+import MuiAlert from '@material-ui/lab/Alert';
 
 export default function CreateUserComponent() {
-  const [open, setOpen] = React.useState(false);
+  const [openDialog, setOpenDialog] = React.useState(false);
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [role, setRole] = React.useState('');
+  const [open, setOpen] = React.useState(false);
+  const [message, setMessage] = React.useState('');
+  const [severity, setSeverity] = React.useState('success');
+  const [disabled, setDisabled] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
   const handleClickOpen = () => {
-    setOpen(true);
+    setOpenDialog(true);
   };
 
-  const handleClose = () => {
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
+  
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
     setOpen(false);
   };
 
+  const Alert = ((props) => {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+  });
+
+
 
   const createUser = async (e) => {
+    setDisabled(true);
+    setLoading(true);
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:5000/users/signup', {
@@ -34,31 +57,52 @@ export default function CreateUserComponent() {
       if (response) {
         // setUsersList(newUsersList);
         // return response;
-        handleClose();
+        setMessage('User Created successfully');
+        setOpen(true);
+        setLoading(false);
+        setSeverity('success');
+        setDisabled(false);
+        handleCloseDialog();
       }
     } catch (error) {
-      console.log(error);
-      handleClose();
+      setLoading(false);
+      setDisabled(false);
+      setMessage(error.response.data.message);
+      setSeverity('error');
+      setOpen(true);
+      handleCloseDialog();
     }
+    setEmail('');
+    setPassword('');
+    setRole('');
   }
+
+
 
   return (
     <div>
+      <Snackbar onClose={handleClose} open={open} autoHideDuration={2000} >
+        <Alert onClose={handleClose} severity={severity}>
+          {message}
+        </Alert>
+      </Snackbar>
       <Button variant="outlined" color="primary" onClick={handleClickOpen}>
         Create User
       </Button>
-      <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-      <form noValidate onSubmit={createUser}>
+      <Dialog open={openDialog} onClose={handleCloseDialog} aria-labelledby="form-dialog-title">
+      <form onSubmit={createUser}>
         <DialogTitle id="form-dialog-title">Create User</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            You can Create a user wit basic details
+            You can Create a user with basic details
           </DialogContentText>
         <TextField
             autoFocus
             variant="outlined"
-            margin="dense"
+            margin="normal"
             id="name"
+            disabled={disabled}
+            color="secondary"
             label="Email Address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -67,10 +111,11 @@ export default function CreateUserComponent() {
             fullWidth
           />
          <TextField
-            autoFocus
             variant="outlined"
             required
-            margin="dense"
+            margin="normal"
+            disabled={disabled}
+            color="secondary"
             id="name"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -79,16 +124,19 @@ export default function CreateUserComponent() {
           />
             <RadioGroup required aria-label="role" name="roleset" value={role} onChange={(e) => setRole(e.target.value)}>
                 <Box display="flex">
-                <FormControlLabel value="admin" control={<Radio />} label="Admin" />
-                <FormControlLabel value="staff" control={<Radio />} label="Staff" />
+                <FormControlLabel value="admin" control={<Radio required />} label="Admin" />
+                <FormControlLabel value="staff" control={<Radio required />} label="Staff" />
                 </Box>
             </RadioGroup>
         </DialogContent>
         <DialogActions>
-          <Button type="submit" color="primary">
+          <Button variant="contained" type="submit" color="secondary">
+              <span style={{ marginRight: '8px' }}>
+                {(disabled) ? <CircularProgress size={20} /> : null}
+              </span>
             Create
           </Button>
-          <Button onClick={handleClose} color="primary">
+          <Button variant="contained" onClick={handleCloseDialog} color="primary">
             Cancel
           </Button>
         </DialogActions>
