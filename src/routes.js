@@ -13,27 +13,27 @@ import { AuthContext } from './context/authContext';
 const Routes = () => {
     const { admin } = useContext(AuthContext);
     return (
-        <Switch>
-            <PrivateRoute path="/payments">
-                <StripeComponent />
-            </PrivateRoute>
-            <PrivateRoute path="/request">
-                <RequestPaymentComponent />
-            </PrivateRoute>
-            <PrivateRoute path="/history">
-                <HistoryComponent />
-            </PrivateRoute>
-            <PrivateRoute path="/refund">
-                <RefundComponent />
-            </PrivateRoute >
-            <PrivateRoute path="/changepassword">
-                <ChangePasswordComponent />
-            </PrivateRoute>
-            <Route path="/login">
-                <SignInComponent/>
-            </Route>
-            { admin ? <PrivateRoute path="/manage-users" ><ManageUsersComponent /> </PrivateRoute> : <Redirect to="/login" />}
-        </Switch>
+            <Switch>
+                <PrivateRoute path="/payments">
+                    <StripeComponent />
+                </PrivateRoute>
+                <PrivateRoute path="/request">
+                    <RequestPaymentComponent />
+                </PrivateRoute>
+                <PrivateRoute path="/history">
+                    <HistoryComponent />
+                </PrivateRoute>
+                <PrivateRoute path="/refund">
+                    <RefundComponent />
+                </PrivateRoute >
+                <PrivateRoute path="/changepassword">
+                    <ChangePasswordComponent />
+                </PrivateRoute>
+                <Route path="/login">
+                    <SignInComponent />
+                </Route>
+                {admin ? <PrivateRoute path="/manage-users" ><ManageUsersComponent /> </PrivateRoute> : <Redirect to="/login" />}
+            </Switch>
     )
 }
 

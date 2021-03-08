@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { Tabs, Tab } from '@material-ui/core';
 import { matchPath, NavLink, useLocation, withRouter } from "react-router-dom";
 import { AuthContext } from '../../context/authContext';
+import withWidth, { isWidthUp } from "@material-ui/core/withWidth";
 
 const navItems = [
     {
@@ -46,6 +47,13 @@ const TabPanelComponent = (props) => {
 
     console.log(authContext);
 
+    let condTabOrientation;
+    if (isWidthUp("sm", props.width)) {
+      condTabOrientation = "vertical";
+    } else {
+      condTabOrientation = "horizontal";
+    }
+
     if (!authContext.admin) {
         const index = navItems.findIndex((item) => item.id === 'manage-users' );
         if (index > -1) {
@@ -56,7 +64,7 @@ const TabPanelComponent = (props) => {
     const activeItem = navItems.find((item) => !!matchPath(pathname, { path: item.path }));
     return (
         <div>
-            <Tabs value={activeItem?.id} orientation="vertical" TabIndicatorProps={{
+            <Tabs value={activeItem?.id} orientation={condTabOrientation} TabIndicatorProps={{
            style: { background: "#DD2C00" }
          }}>
                 {navItems.map((item) => (
@@ -68,4 +76,4 @@ const TabPanelComponent = (props) => {
     );
 }
 
-export default withRouter(TabPanelComponent);
+export default withRouter(withWidth() (TabPanelComponent));

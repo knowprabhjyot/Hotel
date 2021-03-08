@@ -9,6 +9,8 @@ router.post('/', async (req, res) => {
 
     var customer = await stripe.customers.create({
         name: data.name,
+        email: data.mail,
+        phone: data.contact,
         address: {
           line1: '510 Townsend St',
           postal_code: '98140',
@@ -77,7 +79,7 @@ router.get('/', async (req, res) => {
     try {
         const paymentHistory = await stripe.paymentIntents.list({});
         const paymentData = (paymentHistory.data.map((item) => {
-            return {name: item.metadata.name, amount: item.amount, checkIn: item.metadata.checkIn, checkOut: item.metadata.checkOut, contact: item.metadata.contact, email: item.metadata.email, receipt_url: item.charges.data[0].receipt_url}
+            return {name: item.metadata.name, amount: item.amount, checkIn: item.metadata.checkIn, checkOut: item.metadata.checkOut, contact: item.metadata.contact, email: item.metadata.email}
         }));
         return res.status(200).json({
             message: 'Fetched Payment History Successfully',

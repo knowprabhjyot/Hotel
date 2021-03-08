@@ -8,6 +8,7 @@ import { Redirect, useHistory, useLocation } from 'react-router';
 import axios from 'axios';
 import { AuthContext } from './context/authContext';
 import MuiAlert from '@material-ui/lab/Alert';
+import HeaderComponent from './components/header/header';
 
 const theme = createMuiTheme({
   palette: {
@@ -139,6 +140,7 @@ const App = (props) => {
   >
     <ThemeProvider theme={theme}>
       <Box style={{ height: '100vh' }}>
+          { token ? <HeaderComponent /> : null}
           <Snackbar open={open} autoHideDuration={3000} onClose={handleClose}>
             <Alert onClose={handleClose} severity={severity}>
               {message}
@@ -146,7 +148,7 @@ const App = (props) => {
           </Snackbar>
         <Grid container>
         <Grid item xs={3} sm={2}>
-          <Box display="flex" alignItems>
+          <Box display="flex">
             {token ? 
             <Box display="flex" flexDirection="column">
                <img className={classes.logo} src="../assets/images/logo.png" alt="logo" />
@@ -156,7 +158,7 @@ const App = (props) => {
           </Box>
           </Grid>
           <Grid item xs={!token ? 12 : 9} sm={!token ? 12 : 10}  >
-            <Box marginTop="100px" display="flex" justifyContent="center" alignItems="center" >
+            <Box width="100%" marginTop="100px" display="flex" justifyContent="center" alignItems="center" >
             { token ? <Redirect exact from="/" to="/payments" /> : <Redirect exact from="/" to="/login" />}
               <Routes />
             </Box>
