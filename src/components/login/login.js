@@ -1,11 +1,9 @@
-import React, { useContext, useEffect, useState } from 'react';
-import Avatar from '@material-ui/core/Avatar';
+import React, { useContext, useState } from 'react';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import Link from '@material-ui/core/Link';
 import Box from '@material-ui/core/Box';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
@@ -20,7 +18,7 @@ function Copyright() {
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
       <Link color="inherit">
-        Big payment Solutions
+        Big Payment Solution
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -31,7 +29,6 @@ function Copyright() {
 const Alert = ((props) => {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 });
-
 
 
 const useStyles = makeStyles((theme) => ({
@@ -75,7 +72,7 @@ export default function SignInComponent() {
       e.preventDefault();
       const data = {email, password};
       try {
-        const response = await axios.post('http://localhost:5000/users/login', data);
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/users/login`, data);
         if (response) {
             setTimeout(() => {
               setDisabled(false);

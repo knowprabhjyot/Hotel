@@ -34,6 +34,12 @@ const HistoryComponent = () => {
         container: {
             maxHeight: 440,
         },
+        paper: {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: '300px'
+        }
     });
     const classes = useStyles();
     const columns = [
@@ -48,7 +54,7 @@ const HistoryComponent = () => {
     const getPaymentHistory = async () => {
         setLoading(true);
         try {
-            const response = await axios.get('http://localhost:5000/payments');
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/payments`);
             if (response) {
                 setPaymentHistory(response.data.data);
                 console.log(paymentHistory, 'value');
@@ -91,7 +97,8 @@ const HistoryComponent = () => {
             { loading ? <CircularProgress color="secondary" /> : null}
             { !loading ? <Grid container>
                 <Box display="flex" flexDirection="column" className={classes.root}>
-                    <Paper>
+                    <Paper className={classes.paper}>
+                        { paymentHistory.length > 0 ? <div className={classes.root}> 
                         <Grid item>
                             <TableContainer className={classes.container}>
                                 <Table stickyHeader aria-label="sticky table">
@@ -137,6 +144,7 @@ const HistoryComponent = () => {
                                 onChangeRowsPerPage={handleChangeRowsPerPage}
                             />
                         </Grid>
+                        </div> : <div>No Payment History Found</div> }
                     </Paper>
                 </Box>
             </Grid> : null }

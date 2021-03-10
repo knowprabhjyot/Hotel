@@ -20,7 +20,6 @@ export default function CreateUserComponent() {
   const [message, setMessage] = React.useState('');
   const [severity, setSeverity] = React.useState('success');
   const [disabled, setDisabled] = React.useState(false);
-  const [loading, setLoading] = React.useState(false);
   const handleClickOpen = () => {
     setOpenDialog(true);
   };
@@ -47,10 +46,9 @@ export default function CreateUserComponent() {
 
   const createUser = async (e) => {
     setDisabled(true);
-    setLoading(true);
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/users/signup', {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/users/signup`, {
         email,
         password,
         role,
@@ -61,14 +59,12 @@ export default function CreateUserComponent() {
         // return response;
         setMessage('User Created successfully');
         setOpen(true);
-        setLoading(false);
         setSeverity('success');
         setDisabled(false);
         handleCloseDialog();
       }
     } catch (error) {
       console.log(error, 'error');
-      setLoading(false);
       setDisabled(false);
       (error.response.data.message) ? setMessage(error.response.data.message) : setMessage('Something went wrong');
       setSeverity('error');

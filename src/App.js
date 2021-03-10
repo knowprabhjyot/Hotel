@@ -1,10 +1,10 @@
-import { Box, createMuiTheme, Grid, Hidden, makeStyles, Snackbar, ThemeProvider } from '@material-ui/core';
+import { Box, createMuiTheme, Grid, makeStyles, Snackbar, ThemeProvider } from '@material-ui/core';
 import { blueGrey, red } from '@material-ui/core/colors';
 import Routes from './routes';
 import React, { useCallback, useEffect, useState } from 'react';
 import './App.css';
 import TabPanelComponent from './components/tab-panel/tabPanel';
-import { Redirect, useHistory, useLocation } from 'react-router';
+import { Redirect, useHistory } from 'react-router';
 import axios from 'axios';
 import { AuthContext } from './context/authContext';
 import MuiAlert from '@material-ui/lab/Alert';
@@ -97,6 +97,7 @@ const App = (props) => {
   }, []);
 
   useEffect(() => {
+    console.log(process.env, 'process');
     if (token && tokenExpirationDate) {
       const remainingTime = tokenExpirationDate.getTime() - new Date().getTime();
       logoutTimer = setTimeout(logout, remainingTime);

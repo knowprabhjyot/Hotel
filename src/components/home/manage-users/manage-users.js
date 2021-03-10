@@ -36,7 +36,7 @@ export default function ManageUsersComponent() {
   const getUsersList = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/users');
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/users`);
       if (response) {
         const newUsersList = response.data.map(({ _id, email, role }) => {
           return { id: _id, email, role }
@@ -54,7 +54,7 @@ export default function ManageUsersComponent() {
   const deleteUser = async (id) => {
     if (window.confirm('Do you want to delete User ?')) {
       try {
-        const response = await axios.delete(`http://localhost:5000/users/${id}`);
+        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/users/${id}`);
         if (response) {
           const index = usersList.findIndex((item) => item.id === id);
           if (index > 0) {

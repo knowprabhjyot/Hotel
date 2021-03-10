@@ -17,14 +17,17 @@
     "date-fns": "^2.13.0",
     "materialui-daterange-picker": "^1.1.92",
     "react": "^17.0.1",
+    "react-app-env": "^1.2.3",
     "react-dom": "^17.0.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "web-vitals": "^1.1.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "react-app-env --env-file=config/development.env start",
+    "start:prod": "react-app-env --env-file=config/production.env start start", 
+    "build": "react-app-env --env-file=config/production.env start build",
+    "build:prod": "react-app-env npm run build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

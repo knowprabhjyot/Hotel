@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Box, Button, CircularProgress, FormControl, Grid, InputAdornment, InputLabel, makeStyles, OutlinedInput, Paper, Snackbar, TextField } from '@material-ui/core';
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { DateRangePicker } from "materialui-daterange-picker";
@@ -23,7 +23,6 @@ const PaymentsComponent = (props) => {
     const stripe = useStripe();
     const elements = useElements();
     const history = useHistory();
-    const [isLoggedIn, setLogin] = React.useState(false);
 
     const Alert = ((props) => {
         return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -71,7 +70,7 @@ const PaymentsComponent = (props) => {
         if (!error) {
             const { id } = paymentMethod;
             try {
-                const response = await axios.post('http://localhost:5000/payments', {data, id});
+                const response = await axios.post(`${process.env.REACT_APP_API_URL}/payments`, {data, id});
                 setMessage(response.data.message);
                 setOpen(true);
                 setSeverity('success');
@@ -82,6 +81,7 @@ const PaymentsComponent = (props) => {
             } catch (error) {
                 setMessage(error.message);
                 setOpen(true);
+                card.update({ disabled: false})
                 setDisable(false);
                 setSeverity('error');
             }
