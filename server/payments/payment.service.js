@@ -114,11 +114,11 @@ async function getPaymentHistory() {
     for (let item of paymentHistory.data) {
         const invoice = (item.invoice) ? item.invoice : null;
         let { metadata } = item;
+        console.log(item.currency);
         if (invoice) {
             const invoiceDetail = await stripe.invoices.retrieve(invoice);
             metadata = invoiceDetail.metadata;
         }
-        console.log(metadata);
         paymentData.push({id: item.id, name: metadata.name, amount: item.amount, author: metadata.author, checkIn: metadata.checkIn, checkOut: metadata.checkOut, contact: metadata.contact, email: metadata.email, refunded: item.charges.data[0] ? item.charges.data[0].refunded : null, amountReceived: item.amount_received});
     }
 

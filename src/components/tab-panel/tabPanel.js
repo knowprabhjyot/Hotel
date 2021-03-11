@@ -11,11 +11,6 @@ const navItems = [
         text: 'Payments',
     },
     {
-        id: 'refund',
-        path: '/refund',
-        text: 'Refund',
-    },
-    {
         id: 'request',
         path: '/request',
         text: 'Request',
