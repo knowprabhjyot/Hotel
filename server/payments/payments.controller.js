@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 // routes
 router.get('/', getPaymentHistory);
 router.post('/', createPayment); 
+router.post('/request', createRequest); 
 module.exports = router;
 
 
@@ -41,3 +42,20 @@ function createPayment(req, res) {
         res.status(500).json({error: error, message: error.message})
     })
 }
+
+function createRequest(req, res) {
+    const data = req.body;
+    const user = req.decoded.sub;
+    paymentService.createRequest(data, user)
+    .then((payment) => {
+        if (!payment.error) {
+            res.status(201).json({data: payment, message: 'Request Sent Succesfully'})
+        } else {
+            res.status(500).json({error: error, message: payment.error.message})
+        }
+    })
+    .catch((error) => {
+        res.status(500).json({error: error, message: error.message})
+    })
+}
+

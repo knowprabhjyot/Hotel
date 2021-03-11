@@ -3,7 +3,6 @@ import { Box, Button, CircularProgress, FormControl, Grid, InputAdornment, Input
 import { DateRangePicker } from "materialui-daterange-picker";
 import axios from 'axios';
 import MuiAlert from '@material-ui/lab/Alert';
-import { useHistory } from 'react-router-dom';
 
 
 const RequestPaymentComponent = () => {
@@ -29,38 +28,33 @@ const RequestPaymentComponent = () => {
             name: fullName,
             email: email,
             contact: contact,
-            amount: amount * 100,
+            amount: amount * 100 * totalRooms,
+            description: description,
             checkIn: dateRange.startDate,
             checkOut: dateRange.endDate,
         }
             
-        // console.log(paymentMethod);
+        try {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/payments/request`, data);
+            setMessage(response.data.message);
+            setOpen(true);
+            setSeverity('success');
+            setDisable(false);
+            setName('');
+            setDescription('');
+            setEmail('');
+            setContact('');
+            setAmount('');
+            setCheckinOut('');
+            setDateRange('');
+            setRooms(1);
 
-        //     if (!error) {
-        //         // const { id } = paymentMethod;
-        //         try {
-        //             // const response = await axios.post(`${process.env.REACT_APP_API_URL}/payments`, {data, id});
-        //             // setMessage(response.data.message);
-        //             setOpen(true);
-        //             setSeverity('success');
-        //             setDisable(false);
-        //             setTimeout(() => {
-        //                 history.push('/history');
-        //             }, 1000);
-        //         } catch (error) {
-        //             setMessage(error.message);
-        //             setOpen(true);
-        //             // card.update({ disabled: false})
-        //             setDisable(false);
-        //             setSeverity('error');
-        //         }
-        //     } else {
-        //         setMessage(error.message);
-        //         setOpen(true);
-        //         // card.update({ disabled: false})
-        //         setDisable(false);
-        //         setSeverity('error');
-        //     }
+        } catch (error) {
+            setMessage(error.message);
+            setOpen(true);
+            setDisable(false);
+            setSeverity('error');
+        }
     };
 
     const classes = useStyles();
@@ -115,7 +109,7 @@ const RequestPaymentComponent = () => {
     const [description, setDescription] = useState('');
     const [dateRange, setDateRange] = useState({});
     const [checkInOut, setCheckinOut] = useState('');
-    const history = useHistory();
+    const [totalRooms, setRooms] = useState(1);
 
     const Alert = ((props) => {
         return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -212,7 +206,7 @@ const RequestPaymentComponent = () => {
                                 onChange={e => setDescription(e.target.value)}
                             />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid item xs={12} sm={6}>
                             <FormControl fullWidth className={classes.margin} variant="outlined">
                                 <InputLabel color="secondary" htmlFor="outlined-adornment-amount">Amount</InputLabel>
                                 <OutlinedInput
@@ -227,6 +221,27 @@ const RequestPaymentComponent = () => {
                                     labelWidth={60}
                                 />
                             </FormControl>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                InputProps={{
+                                    classes: {
+                                        notchedOutline: classes.input,
+                                    },
+                                }}
+                                variant="outlined"
+                                color="secondary"
+                                required
+                                fullWidth
+                                disabled={disabled}
+                                type="number"
+                                id="room"
+                                label="Number of Rooms"
+                                name="room"
+                                autoComplete="number"
+                                value={totalRooms}
+                                onChange={e => setRooms(e.target.value)}
+                            />
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
