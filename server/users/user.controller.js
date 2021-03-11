@@ -5,20 +5,33 @@ const authorize = require('../helpers/authorize')
 const Role = require('../helpers/role');
 
 // routes
-router.post('/login', authenticate);     // public route
 router.get('/', authorize(Role.ADMIN), getAll); // admin only
 router.post('/signup', authorize(Role.ADMIN), createUser); // admin only
 router.get('/:id', authorize(), getById);       // all authenticated users
+router.put('/reset-password', authorize(), resetPassword)
 router.delete('/:id', authorize(Role.ADMIN), deleteUser);
 module.exports = router;
 
-function authenticate(req, res, next) {
-    userService.authenticate(req.body)
-        .then(user => user ? res.json(user) : res.status(400).json({ message: 'Username or password is incorrect' }))
-        .catch((error) => {
-            res.status(500).json({message: error.message})
-            next(error);
-        });
+
+function resetPassword(req, res, next) {
+    const user = req.decoded.sub;
+    const body = {
+        password: req.body.password,
+        newPassword: req.body.newPassword,
+        user
+    }
+    userService.resetPassword(body)
+    .then((response) => {
+        if(response.data) {
+            return res.status(201).json({message: response.message});
+        } else {
+            return res.status(400).json({ message : response.message });
+        }
+    })
+    .catch((error) => {
+        res.status(500).json({message: error.message})
+        next(error);
+    });
 }
 
 function getAll(req, res, next) {

@@ -4,28 +4,40 @@ const User = require('../models/user');
 const bcrypt = require('bcrypt');
 
 module.exports = {
-    authenticate,
     getAll,
-    // getById,
+    resetPassword,
     createUser,
     deleteUser
 };
 
-async function authenticate(body) {
-    const user = await User.findOne({email: body.email});
+async function resetPassword(body) {
+    const user = await User.findById({_id: body.user});
     if (user) {
         const result = await bcrypt.compare(body.password, user.password);
         if (result) {
-            const token = jwt.sign({ sub: user.id, role: user.role }, process.env.JWT_SECRET,  { expiresIn: "1h" });
+            const hash = bcrypt.hashSync(body.newPassword, 10);
+            const updatePassword = await user.update({password: hash});
+            if (!updatePassword.error) {
+                return {
+                    data: true,
+                    message: 'Password Changed Succesfully'
+                }
+            } else {
+                return { data : false,
+                         message : 'Something went wrong while updating' } 
+            }
+        } else {
             return {
-                user,
-                token
+                data: false,
+                message: 'Current password is invalid for the user'
             };
-        } 
-        return null;
-    } 
-    return null;
-   
+        }
+    } else {
+        return {
+            data: false,
+            message: 'User not found'
+        };
+    }
 }
 
 async function createUser(body) {

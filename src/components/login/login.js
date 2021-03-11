@@ -72,11 +72,12 @@ export default function SignInComponent() {
       e.preventDefault();
       const data = {email, password};
       try {
-        const response = await axios.post(`${process.env.REACT_APP_API_URL}/users/login`, data);
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/login`, data);
         if (response) {
             setTimeout(() => {
               setDisabled(false);
               history.push('/payments');
+              window.location.reload();
               authContext.login(response.data.user._id,response.data.user.role, response.data.token);
             }, 1000);
         }

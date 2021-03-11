@@ -5,6 +5,8 @@ const cors = require('cors');
 require('dotenv').config();
 const userRoutes = require('./users/user.controller');
 const paymentRoutes = require('./payments/payments.controller');
+const authRoutes = require('./auth/auth.controller');
+
 const PORT = process.env.PORT || 5000;
 const validateUser = require('./auth');
 var morgan = require('morgan')
@@ -23,8 +25,9 @@ mongoose.connection.on('connected', () => {
     console.log('Database connected...');
 })
 
-app.use('/payments',validateUser,  paymentRoutes);
-app.use('/users', userRoutes);
+app.use('/payments', validateUser,  paymentRoutes);
+app.use('/users',validateUser, userRoutes);
+app.use('/auth', authRoutes);
 
 app.use('/', (req, res) => {
     res.send('END POINTS');

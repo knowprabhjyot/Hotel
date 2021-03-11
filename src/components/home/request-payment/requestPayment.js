@@ -59,9 +59,6 @@ const RequestPaymentComponent = () => {
 
     const classes = useStyles();
     const toggle = () => setOpenDate(!openDate);
-    const cardOptions = {
-        hidePostalCode: true
-    }
 
     const chooseDate = (range) => {
         setDateRange(range);
