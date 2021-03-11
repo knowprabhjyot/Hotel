@@ -50,7 +50,7 @@ const RequestPaymentComponent = () => {
             setRooms(1);
 
         } catch (error) {
-            setMessage(error.message);
+            setMessage(error.response.data.message);
             setOpen(true);
             setDisable(false);
             setSeverity('error');

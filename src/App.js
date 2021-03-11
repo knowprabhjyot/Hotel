@@ -56,7 +56,6 @@ const App = (props) => {
   const login = useCallback((uid,role, token, expirationDate) => {
     setToken(token);
     setUserId(uid);
-    console.log(role, 'in login');
     if (role === 'admin') {
       setRole(true);
     }
@@ -97,7 +96,6 @@ const App = (props) => {
   }, []);
 
   useEffect(() => {
-    console.log(process.env, 'process');
     if (token && tokenExpirationDate) {
       const remainingTime = tokenExpirationDate.getTime() - new Date().getTime();
       logoutTimer = setTimeout(logout, remainingTime);

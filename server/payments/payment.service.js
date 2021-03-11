@@ -4,7 +4,8 @@ require('dotenv').config();
 module.exports = {
     getPaymentHistory,
     createPayment,
-    createRequest
+    createRequest,
+    refundPayment
 };
 
 async function createPayment(data, id, user) {
@@ -90,6 +91,15 @@ async function createRequest(data, user) {
         customer: customer.id,
         auto_advance: true,
         collection_method: 'send_invoice',
+        metadata: {
+            checkIn: data.checkIn,
+            checkOut: data.checkOut,
+            email: data.email,
+            description: data.description,
+            name: data.name,
+            contact: data.contact,
+            author: user
+        },
         days_until_due: 5,
     });
 
@@ -100,8 +110,22 @@ async function createRequest(data, user) {
 async function getPaymentHistory() {
     const paymentHistory = await stripe.paymentIntents.list({});
     const paymentData = (paymentHistory.data.map((item) => {
-        return {name: item.metadata.name, amount: item.amount, author: item.metadata.author, checkIn: item.metadata.checkIn, checkOut: item.metadata.checkOut, contact: item.metadata.contact, email: item.metadata.email}
+        return {id: item.id, name: item.metadata.name, amount: item.amount, author: item.metadata.author, checkIn: item.metadata.checkIn, checkOut: item.metadata.checkOut, contact: item.metadata.contact, email: item.metadata.email, refunded: item.charges.data[0] ? item.charges.data[0].refunded : null, amountReceived: item.amount_received}
     }));
     return paymentData;
+}
+
+
+async function refundPayment(data, user) {
+    const refund = await stripe.refunds.create({
+        payment_intent: data.id,
+        reason: (data.reason) ? data.reason : 'requested_by_customer',
+        amount: data.amount,
+        metadata: {
+            author: user
+        }
+    });
+
+    return refund;
 }
 

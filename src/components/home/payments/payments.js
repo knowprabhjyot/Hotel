@@ -65,7 +65,6 @@ const PaymentsComponent = (props) => {
             card
         });
         
-        console.log(paymentMethod);
 
         if (!error) {
             const { id } = paymentMethod;
@@ -79,7 +78,7 @@ const PaymentsComponent = (props) => {
                     history.push('/history');
                 }, 1000);
             } catch (error) {
-                setMessage(error.message);
+                setMessage(error.response.data.message);
                 setOpen(true);
                 card.update({ disabled: false})
                 setDisable(false);

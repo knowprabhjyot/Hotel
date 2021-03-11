@@ -1,7 +1,9 @@
-import { Box, CircularProgress, Grid, makeStyles, Paper, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow } from '@material-ui/core';
+import { Box, Button, CircularProgress, Grid, makeStyles, Paper, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Tooltip } from '@material-ui/core';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import MuiAlert from '@material-ui/lab/Alert';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
 
 const HistoryComponent = () => {
     const [paymentHistory, setPaymentHistory] = useState([]);
@@ -43,12 +45,14 @@ const HistoryComponent = () => {
     });
     const classes = useStyles();
     const columns = [
+        { id: 'id', label: 'ID' },
         { id: 'name', label: 'Name' },
         { id: 'email', label: 'Email' },
         { id: 'contact', label: 'Contact' },
         { id: 'checkIn', label: 'CheckIn' },
         { id: 'checkOut', label: 'CheckOut' },
         { id: 'amount', label: 'Amount' },
+        { id: 'action', label: 'Action' }
     ];
 
     const getPaymentHistory = async () => {
@@ -57,7 +61,6 @@ const HistoryComponent = () => {
             const response = await axios.get(`${process.env.REACT_APP_API_URL}/payments`);
             if (response) {
                 setPaymentHistory(response.data.data);
-                console.log(paymentHistory, 'value');
                 setMessage(response.data.message);
                 setSeverity('success');
                 setOpen(true);
@@ -80,15 +83,34 @@ const HistoryComponent = () => {
 
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
-          return;
+            return;
         }
-    
+
         setOpen(false);
-      };
-    
+    };
+
+    const createRefund = async (event, value) => {
+        event.preventDefault();
+        if (window.confirm('Do you want to refund the amount ?')) {
+        try {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/payments/refund`, value);
+            setMessage(response.data.message);
+            getPaymentHistory();
+            setOpen(true);
+            setSeverity('success');
+            setTimeout(() => {
+            }, 1000);
+        } catch (error) {
+            console.log(error);
+            setMessage(error.response.data.message);
+            setOpen(true);
+            setSeverity('error');
+        }
+    }
+    }
 
     return (
-        <Box display="flex" width="80%" justifyContent="center" alignItems="center" height="100%">
+        <Box display="flex" width="90%" justifyContent="center" alignItems="center" height="100%">
             <Snackbar open={open} autoHideDuration={2000} onClose={handleClose} >
                 <Alert onClose={handleClose} severity={severity}>
                     {message}
@@ -98,57 +120,75 @@ const HistoryComponent = () => {
             { !loading ? <Grid container>
                 <Box display="flex" flexDirection="column" className={classes.root}>
                     <Paper className={classes.paper}>
-                        { paymentHistory.length > 0 ? <div className={classes.root}> 
-                        <Grid item>
-                            <TableContainer className={classes.container}>
-                                <Table stickyHeader aria-label="sticky table">
-                                    <TableHead>
-                                        <TableRow>
-                                            {columns.map((column) => (
-                                                <TableCell
-                                                    key={column.id}
-                                                    align={column.align}
-                                                >
-                                                    {column.label}
-                                                </TableCell>
-                                            ))}
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {paymentHistory.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                                            return (
-                                                <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
-                                                    {columns.map((column) => {
-                                                        const value = row[column.id];
-                                                        return (
-                                                            <TableCell key={column.id} align={column.align}>
-                                                                {column.format && typeof value === 'number' ? column.format(value) : value}
-                                                            </TableCell>
-                                                        );
-                                                    })}
-                                                </TableRow>
-                                            );
-                                        })}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                        </Grid>
-                        <Grid item>
-                            <TablePagination
-                                rowsPerPageOptions={[10, 25, 100]}
-                                component="div"
-                                count={paymentHistory.length}
-                                rowsPerPage={rowsPerPage}
-                                page={page}
-                                onChangePage={handleChangePage}
-                                onChangeRowsPerPage={handleChangeRowsPerPage}
-                            />
-                        </Grid>
-                        </div> : <div>No Payment History Found</div> }
+                        {paymentHistory.length > 0 ? <div className={classes.root}>
+                            <Grid item>
+                                <TableContainer className={classes.container}>
+                                    <Table stickyHeader aria-label="sticky table">
+                                        <TableHead>
+                                            <TableRow>
+                                                {columns.map((column) => (
+                                                    <TableCell
+                                                        key={column.id}
+                                                        align={column.align}
+                                                    >
+                                                        {column.label}
+                                                    </TableCell>
+                                                ))}
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {paymentHistory.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                                                return (
+                                                    <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
+                                                        {columns.map((column) => {
+                                                            const value = row[column.id];
+                                                            return (
+                                                                <TableCell key={column.id} align={column.align}>
+                                                                    { column.id === 'action' ?
+                                                                        <Box>
+                                                                            {
+                                                                                row.refunded ?
+                                                                                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                                                                                        <CheckCircleIcon color="primary" />
+                                                                                    Refunded
+                                                                                </Box> :
+                                                                                    <Box>
+                                                                                        {
+                                                                                            row.amountReceived ?
+                                                                                                <Button variant="contained" color="primary" onClick={(event) => createRefund(event, row)}>Refund</Button>
+                                                                                                : <Box display="flex" justifyContent="space-between" alignItems="center">
+                                                                                                    <HourglassEmptyIcon color="primary" />
+            Payment Pending</Box>
+                                                                                        }
+                                                                                    </Box>
+                                                                            }
+                                                                        </Box> : column.format && typeof value === 'number' ? column.format(value) : value}
+                                                                </TableCell>
+                                                            );
+                                                        })}
+                                                    </TableRow>
+                                                );
+                                            })}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </Grid>
+                            <Grid item>
+                                <TablePagination
+                                    rowsPerPageOptions={[10, 25, 100]}
+                                    component="div"
+                                    count={paymentHistory.length}
+                                    rowsPerPage={rowsPerPage}
+                                    page={page}
+                                    onChangePage={handleChangePage}
+                                    onChangeRowsPerPage={handleChangeRowsPerPage}
+                                />
+                            </Grid>
+                        </div> : <div>No Payment History Found</div>}
                     </Paper>
                 </Box>
-            </Grid> : null }
-        </Box> 
+            </Grid> : null}
+        </Box>
 
     )
 }

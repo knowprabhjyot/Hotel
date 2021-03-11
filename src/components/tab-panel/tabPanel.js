@@ -45,8 +45,6 @@ const TabPanelComponent = (props) => {
         authContext.logout();
     }
 
-    console.log(authContext);
-
     let condTabOrientation;
     if (isWidthUp("sm", props.width)) {
       condTabOrientation = "vertical";
@@ -60,7 +58,6 @@ const TabPanelComponent = (props) => {
             navItems.splice(index, 1);
         }
     }
-    console.log(navItems);
     const activeItem = navItems.find((item) => !!matchPath(pathname, { path: item.path }));
     return (
         <div>

@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 router.get('/', getPaymentHistory);
 router.post('/', createPayment); 
 router.post('/request', createRequest); 
+router.post('/refund', refundPayment); 
 module.exports = router;
 
 
@@ -59,3 +60,19 @@ function createRequest(req, res) {
     })
 }
 
+
+function refundPayment(req, res) {
+    const data = req.body;
+    const user = req.decoded.sub;
+    paymentService.refundPayment(data, user)
+    .then((refund) => {
+        if (!refund.error) {
+            res.status(201).json({data: refund, message: 'Refund Sucessful'})
+        } else {
+            res.status(500).json({error: error, message: refund.error.message})
+        }
+    })
+    .catch((error) => {
+        res.status(500).json({error: error, message: error.message})
+    })
+}
