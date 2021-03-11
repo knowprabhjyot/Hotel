@@ -109,9 +109,19 @@ async function createRequest(data, user) {
 
 async function getPaymentHistory() {
     const paymentHistory = await stripe.paymentIntents.list({});
-    const paymentData = (paymentHistory.data.map((item) => {
-        return {id: item.id, name: item.metadata.name, amount: item.amount, author: item.metadata.author, checkIn: item.metadata.checkIn, checkOut: item.metadata.checkOut, contact: item.metadata.contact, email: item.metadata.email, refunded: item.charges.data[0] ? item.charges.data[0].refunded : null, amountReceived: item.amount_received}
-    }));
+    let paymentData = [];
+
+    for (let item of paymentHistory.data) {
+        const invoice = (item.invoice) ? item.invoice : null;
+        let { metadata } = item;
+        if (invoice) {
+            const invoiceDetail = await stripe.invoices.retrieve(invoice);
+            metadata = invoiceDetail.metadata;
+        }
+        console.log(metadata);
+        paymentData.push({id: item.id, name: metadata.name, amount: item.amount, author: metadata.author, checkIn: metadata.checkIn, checkOut: metadata.checkOut, contact: metadata.contact, email: metadata.email, refunded: item.charges.data[0] ? item.charges.data[0].refunded : null, amountReceived: item.amount_received});
+    }
+
     return paymentData;
 }
 

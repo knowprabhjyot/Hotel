@@ -92,21 +92,21 @@ const HistoryComponent = () => {
     const createRefund = async (event, value) => {
         event.preventDefault();
         if (window.confirm('Do you want to refund the amount ?')) {
-        try {
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}/payments/refund`, value);
-            setMessage(response.data.message);
-            getPaymentHistory();
-            setOpen(true);
-            setSeverity('success');
-            setTimeout(() => {
-            }, 1000);
-        } catch (error) {
-            console.log(error);
-            setMessage(error.response.data.message);
-            setOpen(true);
-            setSeverity('error');
+            try {
+                const response = await axios.post(`${process.env.REACT_APP_API_URL}/payments/refund`, value);
+                setMessage(response.data.message);
+                getPaymentHistory();
+                setOpen(true);
+                setSeverity('success');
+                setTimeout(() => {
+                }, 1000);
+            } catch (error) {
+                console.log(error);
+                setMessage(error.response.data.message);
+                setOpen(true);
+                setSeverity('error');
+            }
         }
-    }
     }
 
     return (
@@ -154,7 +154,7 @@ const HistoryComponent = () => {
                                                                                 </Box> :
                                                                                     <Box>
                                                                                         {
-                                                                                            row.amountReceived ?
+                                                                                            row.amountReceived === row.amount ?
                                                                                                 <Button variant="contained" color="primary" onClick={(event) => createRefund(event, row)}>Refund</Button>
                                                                                                 : <Box display="flex" justifyContent="space-between" alignItems="center">
                                                                                                     <HourglassEmptyIcon color="primary" />
