@@ -1,10 +1,11 @@
 import { Box, Button, CircularProgress, makeStyles, Paper, Snackbar } from '@material-ui/core';
 import { DataGrid } from '@material-ui/data-grid';
 import axios from 'axios';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import DeleteIcon from '@material-ui/icons/Delete';
 import CreateUserComponent from './create-user/create-user';
 import MuiAlert from '@material-ui/lab/Alert';
+import { AuthContext } from '../../../context/authContext';
 
 const columns = [
   { field: 'hotel', headerName: 'Hotel', width: 200 },
@@ -27,6 +28,8 @@ export default function ManageUsersComponent() {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [severity, setSeverity] = useState('success');
+  const authContext  = useContext(AuthContext);
+
 
   const classes = useStyles();
   useEffect(() => {
@@ -116,6 +119,7 @@ export default function ManageUsersComponent() {
           {selectedUser ? <Button
             variant="contained"
             color="primary"
+            disabled={selectedUser === authContext.userId}
             onClick={() => deleteUser(selectedUser)}
             className={classes.button}
             startIcon={<DeleteIcon />}
