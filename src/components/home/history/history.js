@@ -15,7 +15,7 @@ const HistoryComponent = () => {
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
     useEffect(() => {
-        getPaymentHistory();
+        getPaymentHistory();    
         // eslint-disable-next-line
     }, []);
 
@@ -45,7 +45,7 @@ const HistoryComponent = () => {
     });
     const classes = useStyles();
     const columns = [
-        { id: 'id', label: 'ID' },
+        { id: 'hotel', label: 'Hotel Name'},
         { id: 'name', label: 'Name' },
         { id: 'email', label: 'Email' },
         { id: 'contact', label: 'Contact' },
@@ -156,7 +156,7 @@ const HistoryComponent = () => {
                                                                                         {
                                                                                             row.amountReceived === row.amount ?
                                                                                                 <Button variant="contained" color="primary" onClick={(event) => createRefund(event, row)}>Refund</Button>
-                                                                                                : <Box display="flex" justifyContent="space-between" alignItems="center">
+                                                                                                : <Box display="flex" alignItems="center">
                                                                                                     <HourglassEmptyIcon color="primary" />
             Payment Pending</Box>
                                                                                         }

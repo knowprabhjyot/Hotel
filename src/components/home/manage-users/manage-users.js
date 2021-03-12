@@ -7,7 +7,7 @@ import CreateUserComponent from './create-user/create-user';
 import MuiAlert from '@material-ui/lab/Alert';
 
 const columns = [
-  { field: 'id', headerName: 'id', width: 400 },
+  { field: 'hotel', headerName: 'Hotel', width: 200 },
   { field: 'email', headerName: 'Email', width: 400 },
   { field: 'role', headerName: 'Role' },
 ];
@@ -38,8 +38,8 @@ export default function ManageUsersComponent() {
     try {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/users`);
       if (response) {
-        const newUsersList = response.data.map(({ _id, email, role }) => {
-          return { id: _id, email, role }
+        const newUsersList = response.data.map(({ _id, email, role, hotel }) => {
+          return { id: _id, email, role, hotel: hotel.name }
         })
         setUsersList(newUsersList);
         setLoading(false);

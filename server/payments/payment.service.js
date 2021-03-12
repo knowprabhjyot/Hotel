@@ -1,4 +1,5 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const User = require('../models/user');
 require('dotenv').config();
 
 module.exports = {
@@ -9,6 +10,7 @@ module.exports = {
 };
 
 async function createPayment(data, id, user) {
+    const userDetails = await User.findById(user);
     const customer = await stripe.customers.create({
         name: data.name,
         email: data.email,
@@ -23,6 +25,7 @@ async function createPayment(data, id, user) {
         }
     });
 
+    console.log(userDetails, 'hotel info');
     const payment = await stripe.paymentIntents.create({
         amount: data.amount,
         metadata: {
@@ -31,7 +34,8 @@ async function createPayment(data, id, user) {
             email: data.email,
             name: data.name,
             contact: data.contact,
-            author: user
+            author: user,
+            hotel: userDetails.hotel.name
         },
         receipt_email: data.email,
         customer: customer.id,
@@ -57,6 +61,7 @@ async function createPayment(data, id, user) {
 
 
 async function createRequest(data, user) {
+    const userDetails = await User.findById(user);
     const customer = await stripe.customers.create({
         name: data.name,
         email: data.email,
@@ -98,7 +103,8 @@ async function createRequest(data, user) {
             description: data.description,
             name: data.name,
             contact: data.contact,
-            author: user
+            author: user,
+            hotel: userDetails.hotel
         },
         days_until_due: 5,
     });
@@ -118,7 +124,7 @@ async function getPaymentHistory() {
             const invoiceDetail = await stripe.invoices.retrieve(invoice);
             metadata = invoiceDetail.metadata;
         }
-        paymentData.push({id: item.id, name: metadata.name, amount: item.amount, author: metadata.author, checkIn: metadata.checkIn, checkOut: metadata.checkOut, contact: metadata.contact, email: metadata.email, refunded: item.charges.data[0] ? item.charges.data[0].refunded : null, currency: item.currency , amountReceived: item.amount_received});
+        paymentData.push({id: item.id, name: metadata.name, amount: item.amount, author: metadata.author, checkIn: metadata.checkIn, checkOut: metadata.checkOut, hotel: metadata.hotel, contact: metadata.contact, email: metadata.email, refunded: item.charges.data[0] ? item.charges.data[0].refunded : null, currency: item.currency , amountReceived: item.amount_received});
     }
 
     return paymentData;

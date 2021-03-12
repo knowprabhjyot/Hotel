@@ -74,11 +74,11 @@ export default function SignInComponent() {
       try {
         const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/login`, data);
         if (response) {
+          authContext.login(response.data.user._id,response.data.user.role, response.data.token);
             setTimeout(() => {
               setDisabled(false);
               history.push('/payments');
               window.location.reload();
-              authContext.login(response.data.user._id,response.data.user.role, response.data.token);
             }, 1000);
         }
       } catch(error) {

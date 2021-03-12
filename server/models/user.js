@@ -16,8 +16,11 @@ const User = mongoose.model('User', {
         type: String,
         required: true
     },
-    hotels: {
-        type: [{type: mongoose.Schema.Types.ObjectId, ref: 'Hotel'}],
+    hotel: {
+        type: {
+            id: Number,
+            name: String
+        },
         required: true
     }
 });

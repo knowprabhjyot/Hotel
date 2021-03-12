@@ -6,7 +6,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { Box, CircularProgress, FormControlLabel, Radio, RadioGroup, Snackbar } from '@material-ui/core';
+import { Box, CircularProgress, FormControl, FormControlLabel, InputLabel, MenuItem, Radio, RadioGroup, Select, Snackbar } from '@material-ui/core';
 import axios from 'axios';
 import MuiAlert from '@material-ui/lab/Alert';
 
@@ -14,6 +14,7 @@ export default function CreateUserComponent() {
   const [openDialog, setOpenDialog] = React.useState(false);
   const [email, setEmail] = React.useState('');
   const [name, setName] = React.useState('');
+  const [hotel, setHotel] = React.useState(0);
   const [password, setPassword] = React.useState('');
   const [role, setRole] = React.useState('');
   const [open, setOpen] = React.useState(false);
@@ -52,11 +53,10 @@ export default function CreateUserComponent() {
         email,
         password,
         role,
-        name
+        name,
+        hotel
       });
       if (response) {
-        // setUsersList(newUsersList);
-        // return response;
         setMessage('User Created successfully');
         setOpen(true);
         setSeverity('success');
@@ -75,6 +75,7 @@ export default function CreateUserComponent() {
     setPassword('');  
     setName('');
     setRole('');
+    setHotel(0);
   }
 
 
@@ -136,6 +137,23 @@ export default function CreateUserComponent() {
             label="Password"
             fullWidth
           />
+            <FormControl required margin="normal" fullWidth variant="outlined">
+              <InputLabel required id="Select Hotel">Hotel</InputLabel>
+              <Select
+                labelId="hotel"
+                id="hotel"
+                value={hotel}
+                onChange={(e) => setHotel(e.target.value)}
+                label="Hotel"
+                fullWidth
+                margin="normal"
+              >
+                <MenuItem value={0}>All Hotel</MenuItem>
+                <MenuItem value={1}>Hotel 1</MenuItem>
+                <MenuItem value={2}>Hotel 2</MenuItem>
+                <MenuItem value={3}>Hotel 3</MenuItem>
+              </Select>
+            </FormControl>
             <RadioGroup required aria-label="role" name="roleset" value={role} onChange={(e) => setRole(e.target.value)}>
                 <Box display="flex">
                 <FormControlLabel value="admin" control={<Radio required />} label="Admin" />

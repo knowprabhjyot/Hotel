@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const Role = require('../helpers/role');
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
+const Hotel = require('../helpers/hotel');
 
 module.exports = {
     getAll,
@@ -42,11 +43,13 @@ async function resetPassword(body) {
 
 async function createUser(body) {
     const hash = bcrypt.hashSync(body.password, 10);
+    const hotel = Hotel.find(hot => hot.id === body.hotel);
     const user = new User({
         email: body.email,
         name: body.name,
         password: hash,
-        role: body.role
+        role: body.role,
+        hotel
     });
 
     const user1 = await User.findOne({email: body.email});
