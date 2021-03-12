@@ -146,7 +146,6 @@ export default function CreateUserComponent() {
                 onChange={(e) => setHotel(e.target.value)}
                 label="Hotel"
                 fullWidth
-                margin="normal"
               >
                 <MenuItem value={0}>All Hotel</MenuItem>
                 <MenuItem value={1}>Hotel 1</MenuItem>

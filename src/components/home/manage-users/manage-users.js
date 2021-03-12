@@ -8,8 +8,9 @@ import MuiAlert from '@material-ui/lab/Alert';
 
 const columns = [
   { field: 'hotel', headerName: 'Hotel', width: 200 },
-  { field: 'email', headerName: 'Email', width: 400 },
+  { field: 'email', headerName: 'Email', width: 300 },
   { field: 'role', headerName: 'Role' },
+  { field: 'createdAt', headerName: 'Created On', width: 400}
 ];
 
 
@@ -23,9 +24,9 @@ export default function ManageUsersComponent() {
   const [usersList, setUsersList] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [open, setOpen] = React.useState(false);
-  const [message, setMessage] = React.useState('');
-  const [severity, setSeverity] = React.useState('success');
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState('');
+  const [severity, setSeverity] = useState('success');
 
   const classes = useStyles();
   useEffect(() => {
@@ -33,13 +34,18 @@ export default function ManageUsersComponent() {
     // eslint-disable-next-line
   }, []);
 
+  const convertDate = (date) => {
+    return `${new Date(date).getDate()}/${new Date(date).getMonth()}/${new Date(date).getFullYear()}`;
+}
+
+
   const getUsersList = async () => {
     setLoading(true);
     try {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/users`);
       if (response) {
-        const newUsersList = response.data.map(({ _id, email, role, hotel }) => {
-          return { id: _id, email, role, hotel: hotel.name }
+        const newUsersList = response.data.map(({ _id, email, role, hotel, createdAt }) => {
+          return { id: _id, email, role, hotel: hotel.name, createdAt: (createdAt) ? convertDate(createdAt) : '' }
         })
         setUsersList(newUsersList);
         setLoading(false);
