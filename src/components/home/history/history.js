@@ -153,6 +153,8 @@ const HistoryComponent = () => {
                                                                                     Refunded
                                                                                 </Box> :
                                                                                     <Box>
+                                                                                        {                                                                                            console.log(row.amountReceived, row.amout)
+}
                                                                                         {
                                                                                             row.amountReceived === row.amount ?
                                                                                                 <Button variant="contained" color="primary" onClick={(event) => createRefund(event, row)}>Refund</Button>

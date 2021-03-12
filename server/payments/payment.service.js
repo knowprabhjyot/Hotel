@@ -11,6 +11,7 @@ module.exports = {
 
 async function createPayment(data, id, user) {
     const userDetails = await User.findById(user);
+    console.log(userDetails);
     const customer = await stripe.customers.create({
         name: data.name,
         email: data.email,
@@ -25,7 +26,6 @@ async function createPayment(data, id, user) {
         }
     });
 
-    console.log(userDetails, 'hotel info');
     const payment = await stripe.paymentIntents.create({
         amount: data.amount,
         metadata: {
@@ -35,7 +35,9 @@ async function createPayment(data, id, user) {
             name: data.name,
             contact: data.contact,
             author: user,
-            hotel: userDetails.hotel.name
+            hotel: userDetails.hotel.name,
+            hotelId: userDetails.hotel.id,
+            createdAt: Date.now()
         },
         receipt_email: data.email,
         customer: customer.id,
@@ -88,7 +90,8 @@ async function createRequest(data, user) {
             description: data.description,
             name: data.name,
             contact: data.contact,
-            author: user
+            author: user,
+            createdAt: Date.now()
         }
     })
 
@@ -104,7 +107,9 @@ async function createRequest(data, user) {
             name: data.name,
             contact: data.contact,
             author: user,
-            hotel: userDetails.hotel
+            hotel: userDetails.hotel.name,
+            hotelId: userDetails.hotel.id,
+            createdAt: Date.now()
         },
         days_until_due: 5,
     });
@@ -113,21 +118,42 @@ async function createRequest(data, user) {
 }
 
 
-async function getPaymentHistory() {
+async function getPaymentHistory(user) {
+    const userDetails = await User.findById(user);
+    console.log(userDetails);
     const paymentHistory = await stripe.paymentIntents.list({});
     let paymentData = [];
 
     for (let item of paymentHistory.data) {
         const invoice = (item.invoice) ? item.invoice : null;
         let { metadata } = item;
+
         if (invoice) {
             const invoiceDetail = await stripe.invoices.retrieve(invoice);
             metadata = invoiceDetail.metadata;
         }
-        paymentData.push({id: item.id, name: metadata.name, amount: item.amount, author: metadata.author, checkIn: metadata.checkIn, checkOut: metadata.checkOut, hotel: metadata.hotel, contact: metadata.contact, email: metadata.email, refunded: item.charges.data[0] ? item.charges.data[0].refunded : null, currency: item.currency , amountReceived: item.amount_received});
+
+        if (userDetails.role === 'admin') {
+            paymentData.push({id: item.id, name: metadata.name, amount: convertToUSD(item.currency, item.amount) , author: metadata.author, checkIn: convertDate(metadata.checkIn), checkOut: convertDate(metadata.checkOut), hotel: metadata.hotel, contact: metadata.contact, email: metadata.email, refunded: item.charges.data[0] ? item.charges.data[0].refunded : null, currency: item.currency , createdAt: metadata.createdAt, amountReceived: convertToUSD(item.currency, item.amount_received)});
+        } else {
+            if (userDetails.hotel.id == metadata.hotelId) {
+                paymentData.push({id: item.id, name: metadata.name, amount: convertToUSD(item.currency, item.amount), author: metadata.author, checkIn: convertDate(metadata.checkIn), checkOut: convertDate(metadata.checkOut), hotel: metadata.hotel, contact: metadata.contact, email: metadata.email, refunded: item.charges.data[0] ? item.charges.data[0].refunded : null, currency: item.currency , createdAt: metadata.createdAt, amountReceived: convertToUSD(item.currency, item.amount_received)});
+            }
+        }
     }
 
     return paymentData;
+}
+
+const convertToUSD = (currency, amount) => {
+    if (currency === 'usd') {
+        return `$ ${amount / 100}`;
+    }
+    return amount / 100;
+}
+
+const convertDate = (date) => {
+    return `${new Date(date).getDate()}/${new Date(date).getMonth()}/${new Date(date).getFullYear()}`;
 }
 
 
