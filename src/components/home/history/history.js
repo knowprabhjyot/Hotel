@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, Grid, makeStyles, Paper, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow } from '@material-ui/core';
+import { Box, Button, CircularProgress, Grid, makeStyles, Paper, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel } from '@material-ui/core';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import MuiAlert from '@material-ui/lab/Alert';
@@ -13,9 +13,11 @@ const HistoryComponent = () => {
     const [severity, setSeverity] = React.useState('success');
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    const [orderBy, setOrderBy] = useState('hotel');
+    const [order, setOrder] = React.useState('asc');
 
     useEffect(() => {
-        getPaymentHistory();    
+        getPaymentHistory();
         // eslint-disable-next-line
     }, []);
 
@@ -45,7 +47,7 @@ const HistoryComponent = () => {
     });
     const classes = useStyles();
     const columns = [
-        { id: 'hotel', label: 'Hotel Name'},
+        { id: 'hotel', label: 'Hotel Name' },
         { id: 'name', label: 'Name' },
         { id: 'email', label: 'Email' },
         { id: 'contact', label: 'Contact' },
@@ -80,6 +82,15 @@ const HistoryComponent = () => {
         return <MuiAlert elevation={6} variant="filled" {...props} />;
     });
 
+    const createSortHandler = (property) => (event) => {
+        handleRequestSort(event, property);
+    };
+
+    const handleRequestSort = (event, property) => {
+        const isAsc = orderBy === property && order === 'asc';
+        setOrder(isAsc ? 'desc' : 'asc');
+        setOrderBy(property);
+      };
 
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
@@ -88,6 +99,32 @@ const HistoryComponent = () => {
 
         setOpen(false);
     };
+
+    function descendingComparator(a, b, orderBy) {
+        if (b[orderBy] < a[orderBy]) {
+          return -1;
+        }
+        if (b[orderBy] > a[orderBy]) {
+          return 1;
+        }
+        return 0;
+      }
+      
+      function getComparator(order, orderBy) {
+        return order === 'desc'
+          ? (a, b) => descendingComparator(a, b, orderBy)
+          : (a, b) => -descendingComparator(a, b, orderBy);
+      }
+      
+      function stableSort(array, comparator) {
+        const stabilizedThis = array.map((el, index) => [el, index]);
+        stabilizedThis.sort((a, b) => {
+          const order = comparator(a[0], b[0]);
+          if (order !== 0) return order;
+          return a[1] - b[1];
+        });
+        return stabilizedThis.map((el) => el[0]);
+      }
 
     const createRefund = async (event, value) => {
         event.preventDefault();
@@ -131,13 +168,22 @@ const HistoryComponent = () => {
                                                         key={column.id}
                                                         align={column.align}
                                                     >
-                                                        {column.label}
+                                                        <TableSortLabel
+                                                            active={orderBy === column.id}
+                                                            direction={orderBy === column.id ? order : 'asc'}
+                                                            onClick={createSortHandler(column.id)}
+                                                        >
+                                                            {column.label}
+                                                        </TableSortLabel>
                                                     </TableCell>
                                                 ))}
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {paymentHistory.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+
+                                            {stableSort(paymentHistory, getComparator(order, orderBy))
+                                                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                                .map((row, index) => {
                                                 return (
                                                     <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
                                                         {columns.map((column) => {
@@ -153,8 +199,8 @@ const HistoryComponent = () => {
                                                                                     Refunded
                                                                                 </Box> :
                                                                                     <Box>
-                                                                                        {                                                                                            console.log(row.amountReceived, row.amout)
-}
+                                                                                        {console.log(row.amountReceived, row.amout)
+                                                                                        }
                                                                                         {
                                                                                             row.amountReceived === row.amount ?
                                                                                                 <Button variant="contained" color="primary" onClick={(event) => createRefund(event, row)}>Refund</Button>
