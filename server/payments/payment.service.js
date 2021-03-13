@@ -118,10 +118,11 @@ async function createRequest(data, user) {
 }
 
 
-async function getPaymentHistory(user) {
+async function getPaymentHistory(user, params) {
     const userDetails = await User.findById(user);
-    console.log(userDetails);
-    const paymentHistory = await stripe.paymentIntents.list({});
+    const paymentHistory = await stripe.paymentIntents.list({
+        limit: 50
+    });
     let paymentData = [];
 
     for (let item of paymentHistory.data) {
@@ -134,10 +135,10 @@ async function getPaymentHistory(user) {
         }
 
         if (userDetails.role === 'admin') {
-            paymentData.push({id: item.id, name: metadata.name, amount: convertToUSD(item.currency, item.amount) , author: metadata.author, checkIn: convertDate(metadata.checkIn), checkOut: convertDate(metadata.checkOut), hotel: metadata.hotel, contact: metadata.contact, email: metadata.email, refunded: item.charges.data[0] ? item.charges.data[0].refunded : null, currency: item.currency , createdAt: metadata.createdAt, amountReceived: convertToUSD(item.currency, item.amount_received)});
+            paymentData.push({id: item.id, name: metadata.name, amount: item.amount , author: metadata.author, checkIn: convertDate(metadata.checkIn), checkOut: convertDate(metadata.checkOut), hotel: metadata.hotel, contact: metadata.contact, email: metadata.email, refunded: item.charges.data[0] ? item.charges.data[0].refunded : null, currency: item.currency , createdAt: metadata.createdAt, amountReceived: item.amount_received});
         } else {
             if (userDetails.hotel.id == metadata.hotelId) {
-                paymentData.push({id: item.id, name: metadata.name, amount: convertToUSD(item.currency, item.amount), author: metadata.author, checkIn: convertDate(metadata.checkIn), checkOut: convertDate(metadata.checkOut), hotel: metadata.hotel, contact: metadata.contact, email: metadata.email, refunded: item.charges.data[0] ? item.charges.data[0].refunded : null, currency: item.currency , createdAt: metadata.createdAt, amountReceived: convertToUSD(item.currency, item.amount_received)});
+                paymentData.push({id: item.id, name: metadata.name, amount: item.amount, author: metadata.author, checkIn: convertDate(metadata.checkIn), checkOut: convertDate(metadata.checkOut), hotel: metadata.hotel, contact: metadata.contact, email: metadata.email, refunded: item.charges.data[0] ? item.charges.data[0].refunded : null, currency: item.currency , createdAt: metadata.createdAt, amountReceived: item.amount_received});
             }
         }
     }
