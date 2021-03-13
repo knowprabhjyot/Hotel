@@ -121,7 +121,8 @@ async function createRequest(data, user) {
 async function getPaymentHistory(user, params) {
     const userDetails = await User.findById(user);
     const paymentHistory = await stripe.paymentIntents.list({
-        limit: 50
+        limit: params.limit,
+        starting_after: params.starting_after
     });
     let paymentData = [];
 
@@ -144,13 +145,6 @@ async function getPaymentHistory(user, params) {
     }
 
     return paymentData;
-}
-
-const convertToUSD = (currency, amount) => {
-    if (currency === 'usd') {
-        return `$ ${amount / 100}`;
-    }
-    return amount / 100;
 }
 
 const convertDate = (date) => {

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import MuiAlert from '@material-ui/lab/Alert';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 const HistoryComponent = () => {
     const [paymentHistory, setPaymentHistory] = useState([]);
@@ -15,28 +16,19 @@ const HistoryComponent = () => {
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [orderBy, setOrderBy] = useState('hotel');
     const [order, setOrder] = React.useState('asc');
+    const [starting_after, setStarting] = useState('');
+    const [hasMore, setHasMore] = useState(true);
 
     useEffect(() => {
         getPaymentHistory();
         // eslint-disable-next-line
     }, []);
 
-
-    const handleChangePage = (event, newPage) => {
-        setPage(newPage);
-    };
-
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(+event.target.value);
-        setPage(0);
-    };
-
     const useStyles = makeStyles({
         root: {
             width: '100%',
         },
         container: {
-            maxHeight: 440,
         },
         paper: {
             display: 'flex',
@@ -60,9 +52,13 @@ const HistoryComponent = () => {
     const getPaymentHistory = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/payments`);
+            const startingAfter = (starting_after.length > 0) ? `&starting_after=${starting_after}` : '';
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/payments?limit=${10}${startingAfter}`);
             if (response) {
-                setPaymentHistory(response.data.data);
+                if (response.data.data.length === 0) {
+                    setHasMore(false);
+                }
+                setPaymentHistory(paymentHistory.concat(response.data.data));
                 setMessage(response.data.message);
                 setSeverity('success');
                 setOpen(true);
@@ -90,7 +86,7 @@ const HistoryComponent = () => {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
         setOrderBy(property);
-      };
+    };
 
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
@@ -100,31 +96,41 @@ const HistoryComponent = () => {
         setOpen(false);
     };
 
+    const fetchMoreData = async () => {
+        const id = paymentHistory[paymentHistory.length - 1].id;
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/payments?limit=${10}&starting_after=${id}`);
+        if (response.data.data.length === 0) {
+            setHasMore(false);
+        }
+        setStarting(id);
+        setPaymentHistory(paymentHistory.concat(response.data.data));
+    }
+
     function descendingComparator(a, b, orderBy) {
         if (b[orderBy] < a[orderBy]) {
-          return -1;
+            return -1;
         }
         if (b[orderBy] > a[orderBy]) {
-          return 1;
+            return 1;
         }
         return 0;
-      }
-      
-      function getComparator(order, orderBy) {
+    }
+
+    function getComparator(order, orderBy) {
         return order === 'desc'
-          ? (a, b) => descendingComparator(a, b, orderBy)
-          : (a, b) => -descendingComparator(a, b, orderBy);
-      }
-      
-      function stableSort(array, comparator) {
+            ? (a, b) => descendingComparator(a, b, orderBy)
+            : (a, b) => -descendingComparator(a, b, orderBy);
+    }
+
+    function stableSort(array, comparator) {
         const stabilizedThis = array.map((el, index) => [el, index]);
         stabilizedThis.sort((a, b) => {
-          const order = comparator(a[0], b[0]);
-          if (order !== 0) return order;
-          return a[1] - b[1];
+            const order = comparator(a[0], b[0]);
+            if (order !== 0) return order;
+            return a[1] - b[1];
         });
         return stabilizedThis.map((el) => el[0]);
-      }
+    }
 
     const createRefund = async (event, value) => {
         event.preventDefault();
@@ -157,10 +163,23 @@ const HistoryComponent = () => {
             { !loading ? <Grid container>
                 <Box display="flex" flexDirection="column" className={classes.root}>
                     <Paper className={classes.paper}>
-                        {paymentHistory.length > 0 ? <div className={classes.root}>
+                        {paymentHistory.length > 0 ? <div className={classes.root} >
                             <Grid item>
-                                <TableContainer className={classes.container}>
-                                    <Table stickyHeader aria-label="sticky table">
+                                <TableContainer className={classes.container} id="scrollableDiv" style={{ height: 440, overflow: "auto" }}>
+                                <InfiniteScroll
+                                        dataLength={paymentHistory.length}
+                                        next={fetchMoreData}
+                                        style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignContent: 'center' }} //To put endMessage and loader to the top.
+                                        hasMore={hasMore}
+                                        scrollableTarget="scrollableDiv"
+                                        loader={<Box margin="8px 0px" display="flex" justifyContent="center">
+                                            <CircularProgress color="secondary" />
+                                        </Box>}
+                                        endMessage={<Box margin="8px 0px" display="flex" justifyContent="center">
+                                            NO MORE HISTORY FOUND
+                                                </Box>}
+                                    >
+                                    <Table stickyHeader aria-label="sticky table" >
                                         <TableHead>
                                             <TableRow>
                                                 {columns.map((column) => (
@@ -180,57 +199,43 @@ const HistoryComponent = () => {
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-
-                                            {stableSort(paymentHistory, getComparator(order, orderBy))
-                                                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                                .map((row, index) => {
-                                                return (
-                                                    <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
-                                                        {columns.map((column) => {
-                                                            const value = row[column.id];
-                                                            return (
-                                                                <TableCell key={column.id} align={column.align}>
-                                                                    { column.id === 'action' ?
-                                                                        <Box>
-                                                                            {
-                                                                                row.refunded ?
-                                                                                    <Box display="flex" justifyContent="space-between" alignItems="center">
-                                                                                        <CheckCircleIcon color="primary" />
+                                                {stableSort(paymentHistory, getComparator(order, orderBy))
+                                                    .map((row, index) => {
+                                                        return (
+                                                            <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
+                                                                {columns.map((column) => {
+                                                                    const value = row[column.id];
+                                                                    return (
+                                                                        <TableCell key={column.id} align={column.align}>
+                                                                            { column.id === 'action' ?
+                                                                                <Box>
+                                                                                    {
+                                                                                        row.refunded ?
+                                                                                            <Box display="flex" justifyContent="space-between" alignItems="center">
+                                                                                                <CheckCircleIcon color="primary" />
                                                                                     Refunded
                                                                                 </Box> :
-                                                                                    <Box>
-                                                                                        {console.log(row.amountReceived, row.amout)
-                                                                                        }
-                                                                                        {
-                                                                                            row.amountReceived === row.amount ?
-                                                                                                <Button variant="contained" color="primary" onClick={(event) => createRefund(event, row)}>Refund</Button>
-                                                                                                : <Box display="flex" alignItems="center">
-                                                                                                    <HourglassEmptyIcon color="primary" />
+                                                                                            <Box>
+                                                                                                {
+                                                                                                    row.amountReceived === row.amount ?
+                                                                                                        <Button variant="contained" color="primary" onClick={(event) => createRefund(event, row)}>Refund</Button>
+                                                                                                        : <Box display="flex" alignItems="center">
+                                                                                                            <HourglassEmptyIcon color="primary" />
             Payment Pending</Box>
-                                                                                        }
-                                                                                    </Box>
-                                                                            }
-                                                                        </Box> : column.format && typeof value === 'number' ? column.format(value) : value}
-                                                                </TableCell>
-                                                            );
-                                                        })}
-                                                    </TableRow>
-                                                );
-                                            })}
+                                                                                                }
+                                                                                            </Box>
+                                                                                    }
+                                                                                </Box> : column.format && typeof value === 'number' ? column.format(value) : value}
+                                                                        </TableCell>
+                                                                    );
+                                                                })}
+                                                            </TableRow>
+                                                        );
+                                                    })}
                                         </TableBody>
                                     </Table>
+                                    </InfiniteScroll>
                                 </TableContainer>
-                            </Grid>
-                            <Grid item>
-                                <TablePagination
-                                    rowsPerPageOptions={[10, 25, 100]}
-                                    component="div"
-                                    count={paymentHistory.length}
-                                    rowsPerPage={rowsPerPage}
-                                    page={page}
-                                    onChangePage={handleChangePage}
-                                    onChangeRowsPerPage={handleChangeRowsPerPage}
-                                />
                             </Grid>
                         </div> : <div>No Payment History Found</div>}
                     </Paper>

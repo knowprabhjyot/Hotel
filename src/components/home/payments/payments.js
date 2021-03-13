@@ -59,17 +59,17 @@ const PaymentsComponent = (props) => {
         }
             ;
         const card = elements.getElement(CardElement);
-        card.update({ disabled : true})
+        card.update({ disabled: true })
         const { error, paymentMethod } = await stripe.createPaymentMethod({
             type: "card",
             card
         });
-        
+
 
         if (!error) {
             const { id } = paymentMethod;
             try {
-                const response = await axios.post(`${process.env.REACT_APP_API_URL}/payments`, {data, id});
+                const response = await axios.post(`${process.env.REACT_APP_API_URL}/payments`, { data, id });
                 setMessage(response.data.message);
                 setOpen(true);
                 setSeverity('success');
@@ -80,14 +80,14 @@ const PaymentsComponent = (props) => {
             } catch (error) {
                 setMessage(error.response.data.message);
                 setOpen(true);
-                card.update({ disabled: false})
+                card.update({ disabled: false })
                 setDisable(false);
                 setSeverity('error');
             }
         } else {
             setMessage(error.message);
             setOpen(true);
-            card.update({ disabled: false})
+            card.update({ disabled: false })
             setDisable(false);
             setSeverity('error');
         }
@@ -115,10 +115,10 @@ const PaymentsComponent = (props) => {
     const allowUpto2Decimal = (value) => {
         const separatorList = {
             period: {
-              name: "period",
-              regex: /^\d+(\.\d{0,2})?$/
+                name: "period",
+                regex: /^\d+(\.\d{0,2})?$/
             }
-        };  
+        };
         if (separatorList['period'].regex.test(value)) {
             setAmount(value);
         }
@@ -126,47 +126,47 @@ const PaymentsComponent = (props) => {
 
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
-          return;
+            return;
         }
-    
+
         setOpen(false);
-      };
-    
+    };
+
 
     return (
         <Box display="grid" gridGap="32px" width="80%">
             <Paper className={classes.paper}>
-            <form className={classes.form} onSubmit={HandleSubmit}>
-                <Snackbar onClose={handleClose} open={open} autoHideDuration={2000} >
-                    <Alert onClose={handleClose} severity={severity}>
-                        {message}
-                    </Alert>
-                </Snackbar>
-                <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                        <CardElement options={cardOptions} />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <TextField
-                            autoComplete="fname"
-                            InputProps={{
-                                classes: {
-                                    notchedOutline: classes.input,
-                                },
-                            }}
-                            name="fullName"
-                            variant="outlined"
-                            color="secondary"
-                            disabled={disabled}
-                            required
-                            fullWidth
-                            id="name"
-                            label="Full Name"
-                            value={fullName}
-                            onChange={e => setName(e.target.value)}
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
+                <form className={classes.form} onSubmit={HandleSubmit}>
+                    <Snackbar onClose={handleClose} open={open} autoHideDuration={2000} >
+                        <Alert onClose={handleClose} severity={severity}>
+                            {message}
+                        </Alert>
+                    </Snackbar>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                            <CardElement options={cardOptions} />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                autoComplete="fname"
+                                InputProps={{
+                                    classes: {
+                                        notchedOutline: classes.input,
+                                    },
+                                }}
+                                name="fullName"
+                                variant="outlined"
+                                color="secondary"
+                                disabled={disabled}
+                                required
+                                fullWidth
+                                id="name"
+                                label="Full Name"
+                                value={fullName}
+                                onChange={e => setName(e.target.value)}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
                             <FormControl fullWidth className={classes.margin} variant="outlined">
                                 <InputLabel color="secondary" htmlFor="outlined-adornment-amount">Amount</InputLabel>
                                 <OutlinedInput
@@ -181,88 +181,88 @@ const PaymentsComponent = (props) => {
                                     labelWidth={60}
                                 />
                             </FormControl>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                label="Checkin-Checkout"
+                                name="Checkin"
+                                variant="outlined"
+                                color="secondary"
+                                required
+                                disabled={disabled}
+                                fullWidth
+                                value={checkInOut}
+                                type="text"
+                                autoComplete="off"
+                                onFocus={e => setOpenDate(!openDate)}
+                                onClick={e => setOpenDate(!openDate)}
+                            />
+                            <DateRangePicker
+                                open={openDate}
+                                toggle={toggle}
+                                onChange={(range) => chooseDate(range)}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                InputProps={{
+                                    classes: {
+                                        notchedOutline: classes.input,
+                                    },
+                                }}
+                                variant="outlined"
+                                color="secondary"
+                                required
+                                fullWidth
+                                disabled={disabled}
+                                id="email"
+                                type="email"
+                                label="Email Address"
+                                name="email"
+                                autoComplete="email"
+                                value={email}
+                                onChange={e => setEmail(e.target.value)}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                InputProps={{
+                                    classes: {
+                                        notchedOutline: classes.input,
+                                    },
+                                }}
+                                variant="outlined"
+                                color="secondary"
+                                required
+                                fullWidth
+                                disabled={disabled}
+                                type="number"
+                                id="contact"
+                                label="Contact number"
+                                name="contact"
+                                autoComplete="number"
+                                value={contact}
+                                onChange={e => setContact(e.target.value)}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                        </Grid>
                     </Grid>
-                    <Grid item xs={12}>
-                        <TextField
-                            label="Checkin-Checkout"
-                            name="Checkin"
+                    <Grid className={classes.submitContainer}>
+                        <Button
+                            type="submit"
                             variant="outlined"
                             color="secondary"
-                            required
+                            className={classes.submit}
                             disabled={disabled}
-                            fullWidth
-                            value={checkInOut}
-                            type="text"
-                            autoComplete="off"
-                            onFocus={e => setOpenDate(!openDate)}
-                            onClick={e => setOpenDate(!openDate)}
-                        />
-                        <DateRangePicker
-                            open={openDate}
-                            toggle={toggle}
-                            onChange={(range) => chooseDate(range)}
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <TextField
-                            InputProps={{
-                                classes: {
-                                    notchedOutline: classes.input,
-                                },
-                            }}
-                            variant="outlined"
-                            color="secondary"
-                            required
-                            fullWidth
-                            disabled={disabled}
-                            id="email"
-                            type="email"
-                            label="Email Address"
-                            name="email"
-                            autoComplete="email"
-                            value={email}
-                            onChange={e => setEmail(e.target.value)}
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <TextField
-                            InputProps={{
-                                classes: {
-                                    notchedOutline: classes.input,
-                                },
-                            }}
-                            variant="outlined"
-                            color="secondary"
-                            required
-                            fullWidth
-                            disabled={disabled}
-                            type="number"
-                            id="contact"
-                            label="Contact number"
-                            name="contact"
-                            autoComplete="number"
-                            value={contact}
-                            onChange={e => setContact(e.target.value)}
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                    </Grid>
-                </Grid>
-                <Grid className={classes.submitContainer}>
-                    <Button
-                        type="submit"
-                        variant="outlined"
-                        color="secondary"
-                        className={classes.submit}
-                        disabled={disabled}
-                    >
-                        <span style={{ marginRight: '8px' }}>
-                            {(disabled) ? <CircularProgress size={20} /> : null}
-                        </span>
+                        >
+                            <span style={{ marginRight: '8px' }}>
+                                {(disabled) ? <CircularProgress size={20} /> : null}
+                            </span>
                             Confirm Payment
                     </Button>
-                </Grid>
-            </form>
+                    </Grid>
+                </form>
             </Paper>
         </Box>
     )

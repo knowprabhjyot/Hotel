@@ -14,7 +14,7 @@ module.exports = router;
 
 function getPaymentHistory(req, res) { 
     const user = req.decoded.sub;
-    paymentService.getPaymentHistory(user)
+    paymentService.getPaymentHistory(user, req.query)
         .then((paymentHistory) => {
             res.status(200).json({
                 message: 'Fetched Payment History Successfully',
