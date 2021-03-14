@@ -5,6 +5,7 @@ import MuiAlert from '@material-ui/lab/Alert';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { useHistory } from 'react-router';
 
 const HistoryComponent = () => {
     const [paymentHistory, setPaymentHistory] = useState([]);
@@ -18,7 +19,8 @@ const HistoryComponent = () => {
     const [order, setOrder] = React.useState('asc');
     const [starting_after, setStarting] = useState('');
     const [hasMore, setHasMore] = useState(true);
-
+    const [fetched, setFetched] = useState(false);
+    const history = useHistory();
     useEffect(() => {
         getPaymentHistory();
         // eslint-disable-next-line
@@ -97,6 +99,7 @@ const HistoryComponent = () => {
     };
 
     const fetchMoreData = async () => {
+        setFetched(true);
         const id = paymentHistory[paymentHistory.length - 1].id;
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/payments?limit=${10}&starting_after=${id}`);
         if (response.data.data.length === 0) {
@@ -104,6 +107,7 @@ const HistoryComponent = () => {
         }
         setStarting(id);
         setPaymentHistory(paymentHistory.concat(response.data.data));
+        setFetched(false);
     }
 
     function descendingComparator(a, b, orderBy) {
@@ -138,7 +142,8 @@ const HistoryComponent = () => {
             try {
                 const response = await axios.post(`${process.env.REACT_APP_API_URL}/payments/refund`, value);
                 setMessage(response.data.message);
-                getPaymentHistory();
+                history.push('/');
+                history.replace('/history');
                 setOpen(true);
                 setSeverity('success');
                 setTimeout(() => {
@@ -172,9 +177,9 @@ const HistoryComponent = () => {
                                         style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignContent: 'center' }} //To put endMessage and loader to the top.
                                         hasMore={hasMore}
                                         scrollableTarget="scrollableDiv"
-                                        loader={<Box margin="8px 0px" display="flex" justifyContent="center">
+                                        loader={ fetched ? <Box margin="8px 0px" display="flex" justifyContent="center">
                                             <CircularProgress color="secondary" />
-                                        </Box>}
+                                        </Box> : null}
                                         endMessage={<Box margin="8px 0px" display="flex" justifyContent="center">
                                             NO MORE HISTORY FOUND
                                                 </Box>}
@@ -225,7 +230,7 @@ const HistoryComponent = () => {
                                                                                                 }
                                                                                             </Box>
                                                                                     }
-                                                                                </Box> : column.format && typeof value === 'number' ? column.format(value) : value}
+                                                                                </Box> : <Box> { column.id === 'amount' ? `$${value / 100}` : value }</Box>}
                                                                         </TableCell>
                                                                     );
                                                                 })}

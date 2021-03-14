@@ -37,9 +37,12 @@ export default function ManageUsersComponent() {
     // eslint-disable-next-line
   }, []);
 
-  const convertDate = (date) => {
-    return `${new Date(date).getDate()}/${new Date(date).getMonth()}/${new Date(date).getFullYear()}`;
+
+const convertDate = (givenDate) => {
+  let date = new Date(givenDate);
+  return ((date.getMonth() > 8) ? (date.getMonth() + 1) : ('0' + (date.getMonth() + 1))) + '/' + ((date.getDate() > 9) ? date.getDate() : ('0' + date.getDate())) + '/' + date.getFullYear()
 }
+
 
 
   const getUsersList = async () => {
