@@ -6,6 +6,7 @@ require('dotenv').config();
 const userRoutes = require('./users/user.controller');
 const paymentRoutes = require('./payments/payments.controller');
 const authRoutes = require('./auth/auth.controller');
+const hotelRoutes = require('./hotel/hotel.controller');
 
 const PORT = process.env.PORT || 5000;
 const validateUser = require('./auth');
@@ -27,6 +28,7 @@ mongoose.connection.on('connected', () => {
 
 app.use('/payments', validateUser,  paymentRoutes);
 app.use('/users',validateUser, userRoutes);
+app.use('/hotel', validateUser, hotelRoutes);
 app.use('/auth', authRoutes);
 
 app.use('/', (req, res) => {

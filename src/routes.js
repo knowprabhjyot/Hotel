@@ -9,6 +9,7 @@ import SignInComponent from './components/login/login';
 import ManageUsersComponent from './components/home/manage-users/manage-users';
 import PrivateRoute from './components/privateRoute';
 import { AuthContext } from './context/authContext';
+import ManageHotelsComponent from './components/home/manage-hotels/create-hotel/manage-hotels';
 
 const Routes = () => {
     const { admin } = useContext(AuthContext);
@@ -33,6 +34,7 @@ const Routes = () => {
                     <SignInComponent />
                 </Route>
                 {admin ? <PrivateRoute path="/manage-users" ><ManageUsersComponent /> </PrivateRoute> : <Redirect to="/login" />}
+                {admin ? <PrivateRoute path="/manage-hotels" ><ManageHotelsComponent /> </PrivateRoute> : <Redirect to="/login" />}
             </Switch>
     )
 }

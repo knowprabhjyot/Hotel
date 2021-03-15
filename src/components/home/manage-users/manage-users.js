@@ -43,8 +43,6 @@ const convertDate = (givenDate) => {
   return ((date.getMonth() > 8) ? (date.getMonth() + 1) : ('0' + (date.getMonth() + 1))) + '/' + ((date.getDate() > 9) ? date.getDate() : ('0' + date.getDate())) + '/' + date.getFullYear()
 }
 
-
-
   const getUsersList = async () => {
     setLoading(true);
     try {
@@ -67,19 +65,17 @@ const convertDate = (givenDate) => {
     if (window.confirm('Do you want to delete User ?')) {
       try {
         const response = await axios.delete(`${process.env.REACT_APP_API_URL}/users/${id}`);
-        if (response) {
-          const index = usersList.findIndex((item) => item.id === id);
-          if (index > 0) {
-            usersList.splice(index, 1);
-            setMessage('Delete user succesfully');
-            setSeverity('success');
-            getUsersList();
-            setOpen(true);
-            setUsersList(usersList);
-            setSelectedUser(null);
-          }
-          return response;
+        const index = usersList.findIndex((item) => item.id === id);
+        if (index > 0) {
+          const userL = usersList;
+          userL.splice(index, 1);
+          setUsersList([...userL]);
+          setMessage('Delete user succesfully');
+          setSeverity('success');
+          setOpen(true);
+          setSelectedUser(null);
         }
+        return response;
       } catch (error) {
         setLoading(false);
         setMessage(error.message);
@@ -98,8 +94,18 @@ const convertDate = (givenDate) => {
   const Alert = ((props) => {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
   });
-
-
+  
+  const updateUserData = (user) => {
+    const userL = usersList;
+    const { _id } = user;
+    user.createdAt = convertDate(user.createdAt);
+    user.hotel = user.hotel.name;
+    user.id = _id;
+    delete user._id;
+    userL.push(user);
+    setUsersList([...userL]);
+  }
+  
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;
@@ -118,7 +124,7 @@ const convertDate = (givenDate) => {
       { loading ? <CircularProgress color="secondary" /> : null}
       { !loading ? <Box display="flex" flexDirection="column" height="400" width="80%">
         <Box display="flex" marginBottom="8px" justifyContent="space-between">
-          <CreateUserComponent />
+          <CreateUserComponent updateUserList={(e) => updateUserData(e)} />
           {selectedUser ? <Button
             variant="contained"
             color="primary"

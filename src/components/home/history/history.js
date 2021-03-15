@@ -171,39 +171,39 @@ const HistoryComponent = () => {
                         {paymentHistory.length > 0 ? <div className={classes.root} >
                             <Grid item>
                                 <TableContainer className={classes.container} id="scrollableDiv" style={{ height: 440, overflow: "auto" }}>
-                                <InfiniteScroll
+                                    <InfiniteScroll
                                         dataLength={paymentHistory.length}
                                         next={fetchMoreData}
                                         style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignContent: 'center' }} //To put endMessage and loader to the top.
                                         hasMore={hasMore}
                                         scrollableTarget="scrollableDiv"
-                                        loader={ fetched ? <Box margin="8px 0px" display="flex" justifyContent="center">
+                                        loader={fetched ? <Box margin="8px 0px" display="flex" justifyContent="center">
                                             <CircularProgress color="secondary" />
                                         </Box> : null}
                                         endMessage={<Box margin="8px 0px" display="flex" justifyContent="center">
                                             NO MORE HISTORY FOUND
                                                 </Box>}
                                     >
-                                    <Table stickyHeader aria-label="sticky table" >
-                                        <TableHead>
-                                            <TableRow>
-                                                {columns.map((column) => (
-                                                    <TableCell
-                                                        key={column.id}
-                                                        align={column.align}
-                                                    >
-                                                        <TableSortLabel
-                                                            active={orderBy === column.id}
-                                                            direction={orderBy === column.id ? order : 'asc'}
-                                                            onClick={createSortHandler(column.id)}
+                                        <Table stickyHeader aria-label="sticky table" >
+                                            <TableHead>
+                                                <TableRow>
+                                                    {columns.map((column) => (
+                                                        <TableCell
+                                                            key={column.id}
+                                                            align={column.align}
                                                         >
-                                                            {column.label}
-                                                        </TableSortLabel>
-                                                    </TableCell>
-                                                ))}
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
+                                                            <TableSortLabel
+                                                                active={orderBy === column.id}
+                                                                direction={orderBy === column.id ? order : 'asc'}
+                                                                onClick={createSortHandler(column.id)}
+                                                            >
+                                                                {column.label}
+                                                            </TableSortLabel>
+                                                        </TableCell>
+                                                    ))}
+                                                </TableRow>
+                                            </TableHead>
+                                            <TableBody>
                                                 {stableSort(paymentHistory, getComparator(order, orderBy))
                                                     .map((row, index) => {
                                                         return (
@@ -216,7 +216,7 @@ const HistoryComponent = () => {
                                                                                 <Box>
                                                                                     {
                                                                                         row.refunded ?
-                                                                                            <Box display="flex" justifyContent="space-between" alignItems="center">
+                                                                                            <Box display="flex" alignItems="center">
                                                                                                 <CheckCircleIcon color="primary" />
                                                                                     Refunded
                                                                                 </Box> :
@@ -230,15 +230,15 @@ const HistoryComponent = () => {
                                                                                                 }
                                                                                             </Box>
                                                                                     }
-                                                                                </Box> : <Box> { column.id === 'amount' ? `$${value / 100}` : value }</Box>}
+                                                                                </Box> : <Box> {column.id === 'amount' ? `$${value / 100}` : value}</Box>}
                                                                         </TableCell>
                                                                     );
                                                                 })}
                                                             </TableRow>
                                                         );
                                                     })}
-                                        </TableBody>
-                                    </Table>
+                                            </TableBody>
+                                        </Table>
                                     </InfiniteScroll>
                                 </TableContainer>
                             </Grid>

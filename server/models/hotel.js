@@ -1,12 +1,15 @@
 const mongoose = require('mongoose');
 
-const Hotel = mongoose.model('Hotel', {
+const Hotel = new mongoose.Schema({
     name: {
-        type: String
+        type: String,
+        unique: true
     },
     address: {
         type: String,
     }
-});
+}, {
+    timestamps: true
+})
 
-module.exports = Hotel
+module.exports = mongoose.model('Hotel', Hotel);

@@ -6,21 +6,19 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { Box, CircularProgress, FormControl, FormControlLabel, InputLabel, MenuItem, Radio, RadioGroup, Select, Snackbar } from '@material-ui/core';
+import { CircularProgress, Snackbar } from '@material-ui/core';
 import axios from 'axios';
 import MuiAlert from '@material-ui/lab/Alert';
 
-export default function CreateUserComponent(props) {
+export default function CreateHotelComponent(props) {
   const [openDialog, setOpenDialog] = React.useState(false);
-  const [email, setEmail] = React.useState('');
   const [name, setName] = React.useState('');
-  const [hotel, setHotel] = React.useState(0);
-  const [password, setPassword] = React.useState('');
-  const [role, setRole] = React.useState('');
+  const [address, setAddress] = React.useState('');
   const [open, setOpen] = React.useState(false);
   const [message, setMessage] = React.useState('');
   const [severity, setSeverity] = React.useState('success');
   const [disabled, setDisabled] = React.useState(false);
+
   const handleClickOpen = () => {
     setOpenDialog(true);
   };
@@ -29,7 +27,6 @@ export default function CreateUserComponent(props) {
     setOpenDialog(false);
   };
 
-  
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -44,21 +41,17 @@ export default function CreateUserComponent(props) {
   });
 
 
-
-  const createUser = async (e) => {
+  const createHotel = async (e) => {
     setDisabled(true);
     e.preventDefault();
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/users/signup`, {
-        email,
-        password,
-        role,
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/hotel`, {
         name,
-        hotel
+        address
       });
       if (response) {
-        setMessage('User Created successfully');
-        props.updateUserList(response.data.result);
+        setMessage(response.data.message);
+        props.updateHotelList(response.data.data);
         setOpen(true);
         setSeverity('success');
         setDisabled(false);
@@ -72,11 +65,8 @@ export default function CreateUserComponent(props) {
       setOpen(true);
       handleCloseDialog();
     }
-    setEmail('');
-    setPassword('');  
     setName('');
-    setRole('');
-    setHotel(0);
+    setAddress('');
   }
 
 
@@ -89,14 +79,14 @@ export default function CreateUserComponent(props) {
         </Alert>
       </Snackbar>
       <Button variant="outlined" color="primary" onClick={handleClickOpen}>
-        Create User
+        Create Hotel
       </Button>
       <Dialog open={openDialog} onClose={handleCloseDialog} aria-labelledby="form-dialog-title">
-      <form onSubmit={createUser}>
-        <DialogTitle id="form-dialog-title">Create User</DialogTitle>
+      <form onSubmit={createHotel}>
+        <DialogTitle id="form-dialog-title">Create Hotel</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            You can Create a user with basic details
+            You can Create a hotel with basic details
           </DialogContentText>
           <TextField
             autoFocus
@@ -115,50 +105,16 @@ export default function CreateUserComponent(props) {
         <TextField
             variant="outlined"
             margin="normal"
-            id="email"
+            id="address"
             disabled={disabled}
             color="secondary"
-            label="Email Address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            type="email"
+            label="Address"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            type="text"
             required
             fullWidth
-          />
-         <TextField
-            variant="outlined"
-            required
-            margin="normal"
-            disabled={disabled}
-            color="secondary"
-            id="name"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            label="Password"
-            fullWidth
-          />
-            <FormControl required margin="normal" fullWidth variant="outlined">
-              <InputLabel required id="Select Hotel">Hotel</InputLabel>
-              <Select
-                labelId="hotel"
-                id="hotel"
-                value={hotel}
-                onChange={(e) => setHotel(e.target.value)}
-                label="Hotel"
-                fullWidth
-              >
-                <MenuItem value={0}>All Hotel</MenuItem>
-                <MenuItem value={1}>Hotel 1</MenuItem>
-                <MenuItem value={2}>Hotel 2</MenuItem>
-                <MenuItem value={3}>Hotel 3</MenuItem>
-              </Select>
-            </FormControl>
-            <RadioGroup required aria-label="role" name="roleset" value={role} onChange={(e) => setRole(e.target.value)}>
-                <Box display="flex">
-                <FormControlLabel value="admin" control={<Radio required />} label="Admin" />
-                <FormControlLabel value="staff" control={<Radio required />} label="Staff" />
-                </Box>
-            </RadioGroup>
+        />
         </DialogContent>
         <DialogActions>
           <Button variant="contained" type="submit" color="secondary">

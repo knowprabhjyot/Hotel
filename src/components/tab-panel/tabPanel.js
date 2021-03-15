@@ -26,6 +26,11 @@ const navItems = [
         text: 'Manage Users',
     },
     {
+        id: 'manage-hotels',
+        path: '/manage-hotels',
+        text: 'Manage Hotels',
+    },
+    {
         id: 'changepassword',
         path: '/changepassword',
         text: 'Change Password',
