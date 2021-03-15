@@ -49,7 +49,7 @@ const convertDate = (givenDate) => {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/users`);
       if (response) {
         const newUsersList = response.data.map(({ _id, email, role, hotel, createdAt }) => {
-          return { id: _id, email, role, hotel: hotel.name, createdAt: (createdAt) ? convertDate(createdAt) : '' }
+          return { id: _id, email, role, hotel: (hotel) ? hotel.name : 'Hotel Was Deleted', createdAt: (createdAt) ? convertDate(createdAt) : '' }
         })
         setUsersList(newUsersList);
         setLoading(false);
