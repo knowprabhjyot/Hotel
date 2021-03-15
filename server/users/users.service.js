@@ -2,7 +2,8 @@ const jwt = require('jsonwebtoken');
 const Role = require('../helpers/role');
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
-const Hotel = require('../helpers/hotel');
+// const Hotel = require('../helpers/hotel');
+const Hotel = require('../models/hotel');
 
 module.exports = {
     getAll,
@@ -43,7 +44,11 @@ async function resetPassword(body) {
 
 async function createUser(body) {
     const hash = bcrypt.hashSync(body.password, 10);
-    const hotel = Hotel.find(hot => hot.id === body.hotel);
+    const hotel = await Hotel.findById({_id: body.hotel});
+    if (body.hotel === 0) {
+        hotel._id = 0;
+        hotel.name = 'All Hotels';
+    }
     const user = new User({
         email: body.email,
         name: body.name,
@@ -77,7 +82,7 @@ async function deleteUser(id) {
 }
 
 async function getAll() {
-    const users = await User.find({});
+    const users = await User.find({}).populate('hotel');
     return users;
 }
 

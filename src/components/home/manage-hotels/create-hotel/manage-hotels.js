@@ -107,9 +107,12 @@ const convertDate = (givenDate) => {
       const { _id } = hotel;
       hotel.id = _id;
       delete hotel._id;
+      hotel.createdAt = convertDate(hotel.createdAt);
       hotelL.push(hotel);
       setHotelList([...hotelL]);
   }
+
+
 
   return (
     <Box display="flex" width="100%" justifyContent="center">

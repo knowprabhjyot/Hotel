@@ -70,7 +70,6 @@ export default function CreateHotelComponent(props) {
   }
 
 
-
   return (
     <div>
       <Snackbar onClose={handleClose} open={open} autoHideDuration={2000} >

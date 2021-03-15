@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
@@ -11,16 +11,21 @@ import axios from 'axios';
 import MuiAlert from '@material-ui/lab/Alert';
 
 export default function CreateUserComponent(props) {
-  const [openDialog, setOpenDialog] = React.useState(false);
-  const [email, setEmail] = React.useState('');
-  const [name, setName] = React.useState('');
-  const [hotel, setHotel] = React.useState(0);
-  const [password, setPassword] = React.useState('');
-  const [role, setRole] = React.useState('');
-  const [open, setOpen] = React.useState(false);
-  const [message, setMessage] = React.useState('');
-  const [severity, setSeverity] = React.useState('success');
-  const [disabled, setDisabled] = React.useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
+  const [hotel, setHotel] = useState('');
+  const [password, setPassword] = useState('');
+  const [role, setRole] = useState('');
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState('');
+  const [severity, setSeverity] = useState('success');
+  const [disabled, setDisabled] = useState(false);
+  const [hotelList, setHotelList] = useState([]);
+  useEffect(() => {
+    getHotelList();
+  }, []);
+
   const handleClickOpen = () => {
     setOpenDialog(true);
   };
@@ -67,7 +72,7 @@ export default function CreateUserComponent(props) {
     } catch (error) {
       console.log(error, 'error');
       setDisabled(false);
-      (error.response.data.message) ? setMessage(error.response.data.message) : setMessage('Something went wrong');
+      (error.message) ? setMessage(error.response.data.message) : setMessage('Something went wrong');
       setSeverity('error');
       setOpen(true);
       handleCloseDialog();
@@ -76,9 +81,28 @@ export default function CreateUserComponent(props) {
     setPassword('');  
     setName('');
     setRole('');
-    setHotel(0);
+    setHotel('');
   }
 
+  const getHotelList = async () => {
+    try {
+      const hotelList = await axios.get(`${process.env.REACT_APP_API_URL}/hotel`);
+      setHotelList(hotelList.data.data);
+    } catch(error) {
+      setMessage(error.message);
+      setSeverity('error');
+      setOpen(true);
+    }
+  }
+
+  
+  const displayHotelList = () => {
+    return (
+      hotelList.map((item) => {
+      return <MenuItem value={item._id}>{item.name}</MenuItem>
+      })
+    )
+  }
 
 
   return (
@@ -147,10 +171,8 @@ export default function CreateUserComponent(props) {
                 label="Hotel"
                 fullWidth
               >
-                <MenuItem value={0}>All Hotel</MenuItem>
-                <MenuItem value={1}>Hotel 1</MenuItem>
-                <MenuItem value={2}>Hotel 2</MenuItem>
-                <MenuItem value={3}>Hotel 3</MenuItem>
+                <MenuItem value="">None</MenuItem>
+                { displayHotelList() }
               </Select>
             </FormControl>
             <RadioGroup required aria-label="role" name="roleset" value={role} onChange={(e) => setRole(e.target.value)}>

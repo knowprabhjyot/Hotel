@@ -54,8 +54,15 @@ const TabPanelComponent = (props) => {
 
     if (!authContext.admin) {
         const index = navItems.findIndex((item) => item.id === 'manage-users' );
-        if (index > -1) {
+        if (index !== -1) {
+            console.log(navItems);
             navItems.splice(index, 1);
+        }
+
+        const index2 = navItems.findIndex((item) => item.id === 'manage-hotels' );
+
+        if (index2 !== -1) {
+            navItems.splice(index2, 1);
         }
     }
     const activeItem = navItems.find((item) => !!matchPath(pathname, { path: item.path }));
