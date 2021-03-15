@@ -45,10 +45,6 @@ async function resetPassword(body) {
 async function createUser(body) {
     const hash = bcrypt.hashSync(body.password, 10);
     const hotel = await Hotel.findById({_id: body.hotel});
-    if (body.hotel === 0) {
-        hotel._id = 0;
-        hotel.name = 'All Hotels';
-    }
     const user = new User({
         email: body.email,
         name: body.name,
