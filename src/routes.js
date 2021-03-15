@@ -9,7 +9,7 @@ import SignInComponent from './components/login/login';
 import ManageUsersComponent from './components/home/manage-users/manage-users';
 import PrivateRoute from './components/privateRoute';
 import { AuthContext } from './context/authContext';
-import ManageHotelsComponent from './components/home/manage-hotels/create-hotel/manage-hotels';
+import ManageHotelsComponent from './components/home/manage-hotels/manage-hotels';
 
 const Routes = () => {
     const { admin } = useContext(AuthContext);

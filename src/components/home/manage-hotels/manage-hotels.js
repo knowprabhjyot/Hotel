@@ -4,7 +4,8 @@ import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import DeleteIcon from '@material-ui/icons/Delete';
 import MuiAlert from '@material-ui/lab/Alert';
-import CreateHotelComponent from '../create-hotel/create-hotel';
+import CreateHotelComponent from './create-hotel/create-hotel';
+import UpdateHotelComponent from './update-hotel/update-hotel';
 
 const columns = [
   { field: 'name', headerName: 'Name', width: 200 },
@@ -86,7 +87,7 @@ const convertDate = (givenDate) => {
 
 
   const selectHotelList = (e) => {
-    setSelectedHotel(e.data.id);
+    setSelectedHotel(e.data);
   }
 
   const Alert = ((props) => {
@@ -112,6 +113,10 @@ const convertDate = (givenDate) => {
       setHotelList([...hotelL]);
   }
 
+  const updateHotelDetails = (hotel) => {
+    console.log(hotel);
+  }
+
 
 
   return (
@@ -125,10 +130,11 @@ const convertDate = (givenDate) => {
       { !loading ? <Box display="flex" flexDirection="column" height="400" width="80%">
         <Box display="flex" marginBottom="8px" justifyContent="space-between">
           <CreateHotelComponent hoteList={hotelList} updateHotelList={(e) => updateHotelData(e)} />
+          { selectedHotel ? <UpdateHotelComponent updateHotelList={e => updateHotelDetails(e)} hotel={selectedHotel} /> : null}
           {selectedHotel ? <Button
             variant="contained"
             color="primary"
-            onClick={() => deleteHotel(selectedHotel)}
+            onClick={() => deleteHotel(selectedHotel.id)}
             className={classes.button}
             startIcon={<DeleteIcon />}
           >
