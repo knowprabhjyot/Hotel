@@ -77,7 +77,7 @@ export default function CreateHotelComponent(props) {
           {message}
         </Alert>
       </Snackbar>
-      <Button variant="outlined" color="primary" onClick={handleClickOpen}>
+      <Button style={{margin: '0px 8px'}} variant="contained" color="secondary" onClick={handleClickOpen}>
         Create Hotel
       </Button>
       <Dialog open={openDialog} onClose={handleCloseDialog} aria-labelledby="form-dialog-title">

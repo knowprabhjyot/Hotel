@@ -17,9 +17,6 @@ const columns = [
 
 export default function ManageUsersComponent() {
   const useStyles = makeStyles((theme) => ({
-    button: {
-      margin: theme.spacing(1),
-    },
   }));
 
   const [usersList, setUsersList] = useState([]);
@@ -123,14 +120,14 @@ const convertDate = (givenDate) => {
       </Snackbar>
       { loading ? <CircularProgress color="secondary" /> : null}
       { !loading ? <Box display="flex" flexDirection="column" height="400" width="80%">
-        <Box display="flex" marginBottom="8px" justifyContent="space-between">
+        <Box display="flex" marginBottom="8px">
           <CreateUserComponent updateUserList={(e) => updateUserData(e)} />
           {selectedUser ? <Button
             variant="contained"
+            style={{margin: '0px 8px'}}
             color="primary"
             disabled={selectedUser === authContext.userId}
             onClick={() => deleteUser(selectedUser)}
-            className={classes.button}
             startIcon={<DeleteIcon />}
           >
             Delete

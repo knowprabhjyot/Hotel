@@ -21,7 +21,6 @@ export default function UpdateHotelComponent(props) {
   const [editMode, setEditMode] = useState(true);
 
   const handleClickOpen = () => {
-    console.log(props);
     setOpenDialog(true);
   };
 
@@ -30,7 +29,7 @@ export default function UpdateHotelComponent(props) {
       setName(props.hotel.name);
       setAddress(props.hotel.address);
     }
-  }, [])
+  }, [props.hotel])
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
@@ -60,7 +59,7 @@ export default function UpdateHotelComponent(props) {
       });
       if (response) {
         setMessage(response.data.message);
-        props.updateHotelList(response.data.data);
+        props.updateHotelList({id: props.hotel.id, name, address});
         setOpen(true);
         setSeverity('success');
         setDisabled(false);
@@ -86,7 +85,7 @@ export default function UpdateHotelComponent(props) {
           {message}
         </Alert>
       </Snackbar>
-      <Button variant="outlined" color="primary" onClick={handleClickOpen}>
+      <Button style={{margin: '0px 8px'}} variant="outlined" color="primary" onClick={handleClickOpen}>
         Update Hotel
       </Button>
       <Dialog open={openDialog} onClose={handleCloseDialog} aria-labelledby="form-dialog-title">

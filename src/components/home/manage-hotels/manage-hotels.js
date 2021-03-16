@@ -16,9 +16,6 @@ const columns = [
 
 export default function ManageHotelsComponent() {
   const useStyles = makeStyles((theme) => ({
-    button: {
-      margin: theme.spacing(1),
-    },
   }));
 
   const [hotelList, setHotelList] = useState([]);
@@ -114,7 +111,14 @@ const convertDate = (givenDate) => {
   }
 
   const updateHotelDetails = (hotel) => {
-    console.log(hotel);
+    const hotelL = hotelList.map((hot) => {
+      if (hotel.id === hot.id) {
+        hot.name = hotel.name;
+        hot.address = hotel.address;
+      }
+      return hot;
+    })
+    setHotelList([...hotelL]);
   }
 
 
@@ -128,14 +132,14 @@ const convertDate = (givenDate) => {
       </Snackbar>
       { loading ? <CircularProgress color="secondary" /> : null}
       { !loading ? <Box display="flex" flexDirection="column" height="400" width="80%">
-        <Box display="flex" marginBottom="8px" justifyContent="space-between">
+        <Box display="flex" marginBottom="8px">
           <CreateHotelComponent hoteList={hotelList} updateHotelList={(e) => updateHotelData(e)} />
           { selectedHotel ? <UpdateHotelComponent updateHotelList={e => updateHotelDetails(e)} hotel={selectedHotel} /> : null}
           {selectedHotel ? <Button
+            style={{margin: '0px 8px'}}
             variant="contained"
             color="primary"
             onClick={() => deleteHotel(selectedHotel.id)}
-            className={classes.button}
             startIcon={<DeleteIcon />}
           >
             Delete

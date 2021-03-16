@@ -60,7 +60,7 @@ function updateHotel(req, res, next) {
     hotelService.updateHotel(req.body, req.params.id)
         .then((response) => {
             if (!response.error) {
-                return res.status(200).json({message: 'Succesfully updated Hotel', data: response})
+                return res.status(200).json({message: 'Succesfully updated Hotel', data: true})
             } else {
                 res.status(400).json({ message: error.message, error: error })
             }
