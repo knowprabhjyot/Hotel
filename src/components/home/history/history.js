@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, Grid, makeStyles, Paper, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel } from '@material-ui/core';
+import { Box, Button, CircularProgress, Grid, makeStyles, Paper, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TextField, Typography } from '@material-ui/core';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import MuiAlert from '@material-ui/lab/Alert';
@@ -6,6 +6,7 @@ import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useHistory } from 'react-router';
+import { DateRangePicker } from "materialui-daterange-picker";
 
 const HistoryComponent = () => {
     const [paymentHistory, setPaymentHistory] = useState([]);
@@ -18,6 +19,10 @@ const HistoryComponent = () => {
     const [starting_after, setStarting] = useState('');
     const [hasMore, setHasMore] = useState(true);
     const [fetched, setFetched] = useState(false);
+    const [openDate, setOpenDate] = React.useState(false);
+    const [dateRange, setDateRange] = React.useState(null);
+    const [filterDate, setFilterDate] = React.useState('');
+
     const history = useHistory();
     useEffect(() => {
         getPaymentHistory();
@@ -96,6 +101,22 @@ const HistoryComponent = () => {
         setOpen(false);
     };
 
+    const toggle = () => setOpenDate(!openDate);
+
+    const chooseDate = (range) => {
+        setDateRange(range);
+        setOpenDate(false);
+        let { startDate, endDate } = range;
+        startDate = convertDate(startDate);
+        endDate = convertDate(endDate);
+        setFilterDate(`${startDate} - ${endDate}`)
+    }
+
+    
+    const convertDate = (date) => {
+        return `${new Date(date).getDate()}/${new Date(date).getMonth()}/${new Date(date).getFullYear()}`;
+    }
+
     const fetchMoreData = async () => {
         setFetched(true);
         const id = paymentHistory[paymentHistory.length - 1].id;
@@ -167,6 +188,33 @@ const HistoryComponent = () => {
                 <Box display="flex" flexDirection="column" className={classes.root}>
                     <Paper className={classes.paper}>
                         {paymentHistory.length > 0 ? <div className={classes.root} >
+                            <Grid item style={{margin: '16px'}}>
+                                <Box display="flex" flexDirection="column">
+                                    <Box display="flex" alignItems="center">
+                                        <TextField
+                                            label="Filter History"
+                                            name="filterDate"
+                                            variant="outlined"
+                                            color="secondary"
+                                            required
+                                            value={filterDate}
+                                            type="text"
+                                            autoComplete="off"
+                                            onFocus={e => setOpenDate(!openDate)}
+                                            onClick={e => setOpenDate(!openDate)}
+                                        />
+                                        <Button disabled={!dateRange} style={{marginLeft: '16px'}} variant="contained" color="primary">
+                                            Filter
+                                        </Button>
+                                    </Box>
+                                    <DateRangePicker
+                                        open={openDate}
+                                        toggle={toggle}
+                                        onChange={(range) => chooseDate(range)}
+                                    />
+                                </Box>
+
+                            </Grid>
                             <Grid item>
                                 <TableContainer className={classes.container} id="scrollableDiv" style={{ height: 440, overflow: "auto" }}>
                                     <InfiniteScroll
