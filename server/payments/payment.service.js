@@ -122,7 +122,11 @@ async function getPaymentHistory(user, params) {
     const userDetails = await User.findById(user);
     const paymentHistory = await stripe.paymentIntents.list({
         limit: params.limit,
-        starting_after: params.starting_after
+        starting_after: params.starting_after,
+        created: {
+            lte: params.lte,
+            gte: params.gte
+        }
     });
     let paymentData = [];
 

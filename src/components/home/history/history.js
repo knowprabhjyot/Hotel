@@ -37,8 +37,8 @@ const HistoryComponent = () => {
         },
         paper: {
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            // alignItems: 'center',
+            // justifyContent: 'center',
             minHeight: '300px'
         }
     });
@@ -120,7 +120,8 @@ const HistoryComponent = () => {
     const fetchMoreData = async () => {
         setFetched(true);
         const id = paymentHistory[paymentHistory.length - 1].id;
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/payments?limit=${10}&starting_after=${id}`);
+        const filterData = (dateRange) ? `&gte=${dateRange.startDate.getTime()/1000}&lte=${dateRange.endDate.getTime()/1000}` : '';
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/payments?limit=${10}&starting_after=${id}${filterData}`);
         if (response.data.data.length === 0) {
             setHasMore(false);
         }
@@ -176,6 +177,37 @@ const HistoryComponent = () => {
         }
     }
 
+    const filterHistory = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/payments?limit=${10}&gte=${dateRange.startDate.getTime()/1000}&lte=${dateRange.endDate.getTime()/1000}`);
+            setPaymentHistory(response.data.data);
+            setLoading(false);
+        } catch (error) {
+            console.log(error);
+            setMessage(error.response.data.message);
+            setOpen(true);
+            setSeverity('error');
+            setLoading(false);
+        }
+    }
+
+    const clearFilter = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/payments?limit=${10}`);
+            setPaymentHistory(response.data.data);
+            setLoading(false);
+        } catch(error) {
+            setLoading(false);
+            setMessage(error.response.data.message);
+            setOpen(true);
+            setSeverity('error');
+        }
+        setDateRange(null);
+        setFilterDate('');
+    }
+
     return (
         <Box display="flex" width="90%" justifyContent="center" alignItems="center" height="100%">
             <Snackbar open={open} autoHideDuration={2000} onClose={handleClose} >
@@ -187,7 +219,7 @@ const HistoryComponent = () => {
             { !loading ? <Grid container>
                 <Box display="flex" flexDirection="column" className={classes.root}>
                     <Paper className={classes.paper}>
-                        {paymentHistory.length > 0 ? <div className={classes.root} >
+                         <div className={classes.root} >
                             <Grid item style={{margin: '16px'}}>
                                 <Box display="flex" flexDirection="column">
                                     <Box display="flex" alignItems="center">
@@ -203,8 +235,11 @@ const HistoryComponent = () => {
                                             onFocus={e => setOpenDate(!openDate)}
                                             onClick={e => setOpenDate(!openDate)}
                                         />
-                                        <Button disabled={!dateRange} style={{marginLeft: '16px'}} variant="contained" color="primary">
+                                        <Button onClick={filterHistory} disabled={!dateRange} style={{marginLeft: '16px'}} variant="contained" color="primary">
                                             Filter
+                                        </Button>
+                                        <Button onClick={clearFilter} disabled={!dateRange} style={{marginLeft: '16px'}} variant="contained" color="secondary">
+                                            Clear Filter
                                         </Button>
                                     </Box>
                                     <DateRangePicker
@@ -215,7 +250,7 @@ const HistoryComponent = () => {
                                 </Box>
 
                             </Grid>
-                            <Grid item>
+                            {paymentHistory.length > 0 ?  <Grid item>
                                 <TableContainer className={classes.container} id="scrollableDiv" style={{ height: 440, overflow: "auto" }}>
                                     <InfiniteScroll
                                         dataLength={paymentHistory.length}
@@ -287,8 +322,8 @@ const HistoryComponent = () => {
                                         </Table>
                                     </InfiniteScroll>
                                 </TableContainer>
-                            </Grid>
-                        </div> : <div>No Payment History Found</div>}
+                            </Grid>  : <Box height="100%" display="flex" justifyContent="center" alignItems="center">No Payment History Found</Box>}
+                        </div>
                     </Paper>
                 </Box>
             </Grid> : null}
