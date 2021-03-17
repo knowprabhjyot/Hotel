@@ -1,5 +1,5 @@
 import { Box, createMuiTheme, Grid, makeStyles, Snackbar, ThemeProvider } from '@material-ui/core';
-import { blueGrey, red } from '@material-ui/core/colors';
+import { blueGrey, red, teal} from '@material-ui/core/colors';
 import Routes from './routes';
 import React, { useCallback, useEffect, useState } from 'react';
 import './App.css';
@@ -18,6 +18,9 @@ const theme = createMuiTheme({
     secondary: {
       main: blueGrey[900],
     },
+    warning: {
+      main: teal[900]
+    }
   },
 });
 

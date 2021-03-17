@@ -7,6 +7,8 @@ import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useHistory } from 'react-router';
 import { DateRangePicker } from "materialui-daterange-picker";
+import jsPDF from 'jspdf'
+import 'jspdf-autotable';
 
 const HistoryComponent = () => {
     const [paymentHistory, setPaymentHistory] = useState([]);
@@ -87,6 +89,17 @@ const HistoryComponent = () => {
         handleRequestSort(event, property);
     };
 
+    const downloadHistoryPdf = () => {
+        const doc = new jsPDF();
+        doc.autoTable({ html: '#my-table', 
+        columnStyles: { 0: { minCellWidth: '100px' }, 1: { minCellWidth: '100px' }, 2: { minCellWidth: '100px' } }, // Cells in first column centered and green
+    });
+        
+        const docName = (filterDate) ? filterDate : 'history';
+        doc.save(`${docName}.pdf`);
+
+    }
+   
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
@@ -113,9 +126,10 @@ const HistoryComponent = () => {
     }
 
     
-    const convertDate = (date) => {
-        return `${new Date(date).getDate()}/${new Date(date).getMonth()}/${new Date(date).getFullYear()}`;
-    }
+    const convertDate = (givenDate) => {
+        let date = new Date(givenDate);
+        return ((date.getMonth() > 8) ? (date.getMonth() + 1) : ('0' + (date.getMonth() + 1))) + '/' + ((date.getDate() > 9) ? date.getDate() : ('0' + date.getDate())) + '/' + date.getFullYear()
+      }
 
     const fetchMoreData = async () => {
         setFetched(true);
@@ -241,6 +255,9 @@ const HistoryComponent = () => {
                                         <Button onClick={clearFilter} disabled={!dateRange} style={{marginLeft: '16px'}} variant="contained" color="secondary">
                                             Clear Filter
                                         </Button>
+                                        <Button disabled={paymentHistory.length === 0} onClick={downloadHistoryPdf} style={{marginLeft: '16px'}} variant="contained" color="warning">
+                                            Download History
+                                        </Button>
                                     </Box>
                                     <DateRangePicker
                                         open={openDate}
@@ -251,7 +268,7 @@ const HistoryComponent = () => {
 
                             </Grid>
                             {paymentHistory.length > 0 ?  <Grid item>
-                                <TableContainer className={classes.container} id="scrollableDiv" style={{ height: 440, overflow: "auto" }}>
+                                <TableContainer  className={classes.container} id="scrollableDiv" style={{ height: 440, overflow: "auto" }}>
                                     <InfiniteScroll
                                         dataLength={paymentHistory.length}
                                         next={fetchMoreData}
@@ -265,7 +282,7 @@ const HistoryComponent = () => {
                                             NO MORE HISTORY FOUND
                                                 </Box>}
                                     >
-                                        <Table stickyHeader aria-label="sticky table" >
+                                        <Table id="my-table" stickyHeader aria-label="sticky table" >
                                             <TableHead>
                                                 <TableRow>
                                                     {columns.map((column) => (
