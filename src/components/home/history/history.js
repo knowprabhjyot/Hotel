@@ -53,7 +53,7 @@ const HistoryComponent = () => {
     const classes = useStyles();
     const columns = [
         { id: 'createdAt', label: 'Transaction Date' },
-        { id: 'hotel', label: 'Hotel Name' },
+        { id: 'hotel', label: 'Hotel' },
         { id: 'name', label: 'Name' },
         { id: 'email', label: 'Email' },
         { id: 'contact', label: 'Contact' },
@@ -164,7 +164,8 @@ const HistoryComponent = () => {
         setFetched(true);
         const id = paymentHistory[paymentHistory.length - 1].id;
         const filterData = (dateRange) ? `&gte=${Math.floor(dateRange.startDate.getTime() / 1000)}&lte=${Math.floor(dateRange.endDate.getTime() / 1000)}` : '';
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/payments?limit=${10}&starting_after=${id}${filterData}`);
+        const hotelFilter = (hotel) ? `&hotel=${hotel}`: '';
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/payments?limit=${10}&starting_after=${id}${filterData}${hotelFilter}`);
         if (response.data.data.length === 0) {
             setHasMore(false);
         }
@@ -267,7 +268,7 @@ const HistoryComponent = () => {
     }
 
     return (
-        <Box display="flex" width="90%" justifyContent="center" alignItems="center" height="100%">
+        <Box display="flex" width="98%" justifyContent="center" alignItems="center" height="100%">
             <Snackbar open={open} autoHideDuration={2000} onClose={handleClose} >
                 <Alert onClose={handleClose} severity={severity}>
                     {message}
@@ -394,11 +395,11 @@ const HistoryComponent = () => {
                                                 {stableSort(paymentHistory, getComparator(order, orderBy))
                                                     .map((row, index) => {
                                                         return (
-                                                            <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
+                                                            <TableRow hover role="checkbox" tabIndex={-1} key={row.code} style ={ index % 2? { background : '#fafafa' }:{ background : '#fff' }}>
                                                                 {columns.map((column) => {
                                                                     const value = row[column.id];
                                                                     return (
-                                                                        <TableCell key={column.id} align={column.align}>
+                                                                        <TableCell key={column.id} align={column.align} >
                                                                             { column.id === 'action' ?
                                                                                 <Box>
                                                                                     {

@@ -64,6 +64,7 @@ async function createPayment(data, id, user) {
 
 async function createRequest(data, user) {
     const userDetails = await User.findById(user);
+    const hotel = await Hotel.findById(userDetails.hotel);
     const customer = await stripe.customers.create({
         name: data.name,
         email: data.email,
@@ -107,8 +108,8 @@ async function createRequest(data, user) {
             name: data.name,
             contact: data.contact,
             author: user,
-            hotel: userDetails.hotel.name,
-            hotelId: userDetails.hotel.id,
+            hotel: hotel.name,
+            hotelId: hotel._id.toString(),
         },
         days_until_due: 5,
     });
@@ -141,7 +142,6 @@ async function getPaymentHistory(user, params) {
         if (userDetails.role === 'admin') {
             paymentData.push({id: item.id, name: metadata.name, amount: item.amount , author: metadata.author, checkIn: convertDate(metadata.checkIn), checkOut: convertDate(metadata.checkOut), hotel: metadata.hotel, hotelId: metadata.hotelId, contact: metadata.contact, email: metadata.email, refunded: item.charges.data[0] ? item.charges.data[0].refunded : null, currency: item.currency , createdAt: convertDate(item.created * 1000), amountReceived: item.amount_received});
         } else {
-            console.log();
             if (userDetails.hotel == metadata.hotelId) {
                 paymentData.push({id: item.id, name: metadata.name, amount: item.amount, author: metadata.author, checkIn: convertDate(metadata.checkIn), checkOut: convertDate(metadata.checkOut), hotel: metadata.hotel, hotelId: metadata.hotelId, contact: metadata.contact, email: metadata.email, refunded: item.charges.data[0] ? item.charges.data[0].refunded : null, currency: item.currency , createdAt: convertDate(item.created * 1000), amountReceived: item.amount_received});
             }
