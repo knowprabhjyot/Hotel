@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, Grid, makeStyles, Paper, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TextField, Typography } from '@material-ui/core';
+import { Box, Button, CircularProgress, FormControl, Grid, InputLabel, makeStyles, MenuItem, Paper, Select, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TextField, Typography } from '@material-ui/core';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import MuiAlert from '@material-ui/lab/Alert';
@@ -24,10 +24,14 @@ const HistoryComponent = () => {
     const [openDate, setOpenDate] = React.useState(false);
     const [dateRange, setDateRange] = React.useState(null);
     const [filterDate, setFilterDate] = React.useState('');
+    const [hotelList, setHotelList] = useState([]);
+    const [hotel, setHotel] = useState('');
+    const [category, setFilterCategory] = useState('');
 
     const history = useHistory();
     useEffect(() => {
         getPaymentHistory();
+        getHotelList();
         // eslint-disable-next-line
     }, []);
 
@@ -46,6 +50,7 @@ const HistoryComponent = () => {
     });
     const classes = useStyles();
     const columns = [
+        { id: 'createdAt', label: 'Transaction Date' },
         { id: 'hotel', label: 'Hotel Name' },
         { id: 'name', label: 'Name' },
         { id: 'email', label: 'Email' },
@@ -89,17 +94,29 @@ const HistoryComponent = () => {
         handleRequestSort(event, property);
     };
 
+
+    const displayHotelList = () => {
+        return (
+            hotelList.map((item) => {
+                return <MenuItem value={item._id}>{item.name}</MenuItem>
+            })
+        )
+    }
+
     const downloadHistoryPdf = () => {
         const doc = new jsPDF();
-        doc.autoTable({ html: '#my-table', 
-        columnStyles: { 0: { minCellWidth: '100px' }, 1: { minCellWidth: '100px' }, 2: { minCellWidth: '100px' } }, // Cells in first column centered and green
-    });
-        
+        doc.autoTable({
+            html: '#my-table',
+            styles: { fontSize: 8 },
+            theme: 'grid',
+            columnStyles: { 0: { minCellWidth: '100px' }, 1: { minCellWidth: '100px' }, 2: { minCellWidth: '100px' } }, // Cells in first column centered and green
+        });
+
         const docName = (filterDate) ? filterDate : 'history';
         doc.save(`${docName}.pdf`);
 
     }
-   
+
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
@@ -125,16 +142,26 @@ const HistoryComponent = () => {
         setFilterDate(`${startDate} - ${endDate}`)
     }
 
-    
+    const getHotelList = async () => {
+        try {
+            const hotelList = await axios.get(`${process.env.REACT_APP_API_URL}/hotel`);
+            setHotelList(hotelList.data.data);
+        } catch (error) {
+            setMessage(error.message);
+            setSeverity('error');
+            setOpen(true);
+        }
+    }
+
     const convertDate = (givenDate) => {
         let date = new Date(givenDate);
         return ((date.getMonth() > 8) ? (date.getMonth() + 1) : ('0' + (date.getMonth() + 1))) + '/' + ((date.getDate() > 9) ? date.getDate() : ('0' + date.getDate())) + '/' + date.getFullYear()
-      }
+    }
 
     const fetchMoreData = async () => {
         setFetched(true);
         const id = paymentHistory[paymentHistory.length - 1].id;
-        const filterData = (dateRange) ? `&gte=${dateRange.startDate.getTime()/1000}&lte=${dateRange.endDate.getTime()/1000}` : '';
+        const filterData = (dateRange) ? `&gte=${Math.floor(dateRange.startDate.getTime() / 1000)}&lte=${Math.floor(dateRange.endDate.getTime() / 1000)}` : '';
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/payments?limit=${10}&starting_after=${id}${filterData}`);
         if (response.data.data.length === 0) {
             setHasMore(false);
@@ -193,8 +220,9 @@ const HistoryComponent = () => {
 
     const filterHistory = async () => {
         setLoading(true);
+        console.log(Math.floor(dateRange.startDate.getTime() / 1000));
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/payments?limit=${10}&gte=${dateRange.startDate.getTime()/1000}&lte=${dateRange.endDate.getTime()/1000}`);
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/payments?limit=${10}&gte=${Math.floor(dateRange.startDate.getTime() / 1000)}&lte=${Math.floor(dateRange.endDate.getTime() / 1000)}`);
             setPaymentHistory(response.data.data);
             setLoading(false);
         } catch (error) {
@@ -212,7 +240,7 @@ const HistoryComponent = () => {
             const response = await axios.get(`${process.env.REACT_APP_API_URL}/payments?limit=${10}`);
             setPaymentHistory(response.data.data);
             setLoading(false);
-        } catch(error) {
+        } catch (error) {
             setLoading(false);
             setMessage(error.response.data.message);
             setOpen(true);
@@ -233,42 +261,81 @@ const HistoryComponent = () => {
             { !loading ? <Grid container>
                 <Box display="flex" flexDirection="column" className={classes.root}>
                     <Paper className={classes.paper}>
-                         <div className={classes.root} >
-                            <Grid item style={{margin: '16px'}}>
+                        <div className={classes.root} >
+                            <Grid item style={{ margin: '16px' }}>
                                 <Box display="flex" flexDirection="column">
                                     <Box display="flex" alignItems="center">
-                                        <TextField
-                                            label="Filter History"
-                                            name="filterDate"
-                                            variant="outlined"
-                                            color="secondary"
-                                            required
-                                            value={filterDate}
-                                            type="text"
-                                            autoComplete="off"
-                                            onFocus={e => setOpenDate(!openDate)}
-                                            onClick={e => setOpenDate(!openDate)}
-                                        />
-                                        <Button onClick={filterHistory} disabled={!dateRange} style={{marginLeft: '16px'}} variant="contained" color="primary">
-                                            Filter
-                                        </Button>
-                                        <Button onClick={clearFilter} disabled={!dateRange} style={{marginLeft: '16px'}} variant="contained" color="secondary">
+                                        <FormControl required margin="normal" style={{width: '200px'}} variant="outlined">
+                                            <InputLabel required id="Select Hotel">Filter By</InputLabel>
+                                            <Select
+                                                labelId="hotel"
+                                                id="hotel"
+                                                value={category}
+                                                onChange={(e) => setFilterCategory(e.target.value)}
+                                                label="Hotel"
+                                            >
+                                                <MenuItem value="">None</MenuItem>
+                                                <MenuItem value={1}>Hotel</MenuItem>
+                                                <MenuItem value={2}>Transaction Date</MenuItem>
+                                            </Select>
+                                        </FormControl>
+
+                                        {
+                                            category === 1 ?
+                                                <FormControl required margin="normal" style={{marginLeft: '30px', width: '200px'}} variant="outlined">
+                                                    <InputLabel required id="Select Hotel">Hotel</InputLabel>
+                                                    <Select
+                                                        labelId="hotel"
+                                                        id="hotel"
+                                                        value={hotel}
+                                                        onChange={(e) => setHotel(e.target.value)}
+                                                        label="Hotel"
+                                                    >
+                                                        <MenuItem value="">None</MenuItem>
+                                                        {displayHotelList()}
+                                                    </Select>
+                                                </FormControl> : null
+                                        }
+                                        {
+                                            category === 2 ?
+                                                <Box display="flex" alignItems="center" >
+                                                    <TextField
+                                                        label="Filter History"
+                                                        name="filterDate"
+                                                        variant="outlined"
+                                                        color="secondary"
+                                                        required
+                                                        value={filterDate}
+                                                        margin="normal"
+                                                        type="text"
+                                                        style={{marginLeft: '30px', width: '200px'}}
+                                                        autoComplete="off"
+                                                        onFocus={e => setOpenDate(!openDate)}
+                                                        onClick={e => setOpenDate(!openDate)}
+                                                    />
+                                                    <Button onClick={filterHistory} disabled={!dateRange} style={{ marginLeft: '16px' }} variant="contained" color="primary">
+                                                        Filter Date
+                                            </Button>
+                                                </Box>
+
+                                                : null}
+                                        <Button onClick={clearFilter} style={{ marginLeft: '16px' }} variant="contained" color="secondary">
                                             Clear Filter
                                         </Button>
-                                        <Button disabled={paymentHistory.length === 0} onClick={downloadHistoryPdf} style={{marginLeft: '16px'}} variant="contained" color="warning">
+                                        <Button disabled={paymentHistory.length === 0} onClick={downloadHistoryPdf} style={{ marginLeft: '16px' }} variant="contained" color="warning">
                                             Download History
                                         </Button>
                                     </Box>
                                     <DateRangePicker
-                                        open={openDate}
-                                        toggle={toggle}
-                                        onChange={(range) => chooseDate(range)}
-                                    />
+                                            open={openDate}
+                                            toggle={toggle}
+                                            onChange={(range) => chooseDate(range)}
+                                        />
                                 </Box>
 
                             </Grid>
-                            {paymentHistory.length > 0 ?  <Grid item>
-                                <TableContainer  className={classes.container} id="scrollableDiv" style={{ height: 440, overflow: "auto" }}>
+                            {paymentHistory.length > 0 ? <Grid item>
+                                <TableContainer className={classes.container} id="scrollableDiv" style={{ height: 440, overflow: "auto" }}>
                                     <InfiniteScroll
                                         dataLength={paymentHistory.length}
                                         next={fetchMoreData}
@@ -339,7 +406,7 @@ const HistoryComponent = () => {
                                         </Table>
                                     </InfiniteScroll>
                                 </TableContainer>
-                            </Grid>  : <Box height="100%" display="flex" justifyContent="center" alignItems="center">No Payment History Found</Box>}
+                            </Grid> : <Box height="100%" display="flex" justifyContent="center" alignItems="center">No Payment History Found</Box>}
                         </div>
                     </Paper>
                 </Box>

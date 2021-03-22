@@ -1,5 +1,6 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const User = require('../models/user');
+const Hotel = require('../models/hotel');
 require('dotenv').config();
 
 module.exports = {
@@ -11,7 +12,7 @@ module.exports = {
 
 async function createPayment(data, id, user) {
     const userDetails = await User.findById(user);
-    console.log(userDetails);
+    const hotel = await Hotel.findById(userDetails.hotel);
     const customer = await stripe.customers.create({
         name: data.name,
         email: data.email,
@@ -35,9 +36,8 @@ async function createPayment(data, id, user) {
             name: data.name,
             contact: data.contact,
             author: user,
-            hotel: userDetails.hotel.name,
-            hotelId: userDetails.hotel.id,
-            createdAt: Date.now()
+            hotel: hotel.name,
+            hotelId: JSON.stringify(hotel._id),
         },
         receipt_email: data.email,
         customer: customer.id,
@@ -109,7 +109,6 @@ async function createRequest(data, user) {
             author: user,
             hotel: userDetails.hotel.name,
             hotelId: userDetails.hotel.id,
-            createdAt: Date.now()
         },
         days_until_due: 5,
     });
@@ -140,10 +139,10 @@ async function getPaymentHistory(user, params) {
         }
 
         if (userDetails.role === 'admin') {
-            paymentData.push({id: item.id, name: metadata.name, amount: item.amount , author: metadata.author, checkIn: convertDate(metadata.checkIn), checkOut: convertDate(metadata.checkOut), hotel: metadata.hotel, contact: metadata.contact, email: metadata.email, refunded: item.charges.data[0] ? item.charges.data[0].refunded : null, currency: item.currency , createdAt: metadata.createdAt, amountReceived: item.amount_received});
+            paymentData.push({id: item.id, name: metadata.name, amount: item.amount , author: metadata.author, checkIn: convertDate(metadata.checkIn), checkOut: convertDate(metadata.checkOut), hotel: metadata.hotel, contact: metadata.contact, email: metadata.email, refunded: item.charges.data[0] ? item.charges.data[0].refunded : null, currency: item.currency , createdAt: convertDate(item.created * 1000), amountReceived: item.amount_received});
         } else {
             if (userDetails.hotel.id == metadata.hotelId) {
-                paymentData.push({id: item.id, name: metadata.name, amount: item.amount, author: metadata.author, checkIn: convertDate(metadata.checkIn), checkOut: convertDate(metadata.checkOut), hotel: metadata.hotel, contact: metadata.contact, email: metadata.email, refunded: item.charges.data[0] ? item.charges.data[0].refunded : null, currency: item.currency , createdAt: metadata.createdAt, amountReceived: item.amount_received});
+                paymentData.push({id: item.id, name: metadata.name, amount: item.amount, author: metadata.author, checkIn: convertDate(metadata.checkIn), checkOut: convertDate(metadata.checkOut), hotel: metadata.hotel, contact: metadata.contact, email: metadata.email, refunded: item.charges.data[0] ? item.charges.data[0].refunded : null, currency: item.currency , createdAt: convertDate(item.created * 1000), amountReceived: item.amount_received});
             }
         }
     }

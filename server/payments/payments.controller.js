@@ -37,10 +37,12 @@ function createPayment(req, res) {
         if (!payment.error) {
             res.status(201).json({data: payment, message: 'Payment Succesful'})
         } else {
-            res.status(500).json({error: error, message: payment.error.message})
+            console.log(payment.error);
+            res.status(500).json({error: payment.error, message: payment.error.message})
         }
     })
     .catch((error) => {
+        console.log(error);
         res.status(500).json({error: error, message: error.message})
     })
 }
