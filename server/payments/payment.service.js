@@ -37,7 +37,7 @@ async function createPayment(data, id, user) {
             contact: data.contact,
             author: user,
             hotel: hotel.name,
-            hotelId: JSON.stringify(hotel._id),
+            hotelId: hotel._id.toString(),
         },
         receipt_email: data.email,
         customer: customer.id,
@@ -139,12 +139,17 @@ async function getPaymentHistory(user, params) {
         }
 
         if (userDetails.role === 'admin') {
-            paymentData.push({id: item.id, name: metadata.name, amount: item.amount , author: metadata.author, checkIn: convertDate(metadata.checkIn), checkOut: convertDate(metadata.checkOut), hotel: metadata.hotel, contact: metadata.contact, email: metadata.email, refunded: item.charges.data[0] ? item.charges.data[0].refunded : null, currency: item.currency , createdAt: convertDate(item.created * 1000), amountReceived: item.amount_received});
+            paymentData.push({id: item.id, name: metadata.name, amount: item.amount , author: metadata.author, checkIn: convertDate(metadata.checkIn), checkOut: convertDate(metadata.checkOut), hotel: metadata.hotel, hotelId: metadata.hotelId, contact: metadata.contact, email: metadata.email, refunded: item.charges.data[0] ? item.charges.data[0].refunded : null, currency: item.currency , createdAt: convertDate(item.created * 1000), amountReceived: item.amount_received});
         } else {
-            if (userDetails.hotel.id == metadata.hotelId) {
-                paymentData.push({id: item.id, name: metadata.name, amount: item.amount, author: metadata.author, checkIn: convertDate(metadata.checkIn), checkOut: convertDate(metadata.checkOut), hotel: metadata.hotel, contact: metadata.contact, email: metadata.email, refunded: item.charges.data[0] ? item.charges.data[0].refunded : null, currency: item.currency , createdAt: convertDate(item.created * 1000), amountReceived: item.amount_received});
+            console.log();
+            if (userDetails.hotel == metadata.hotelId) {
+                paymentData.push({id: item.id, name: metadata.name, amount: item.amount, author: metadata.author, checkIn: convertDate(metadata.checkIn), checkOut: convertDate(metadata.checkOut), hotel: metadata.hotel, hotelId: metadata.hotelId, contact: metadata.contact, email: metadata.email, refunded: item.charges.data[0] ? item.charges.data[0].refunded : null, currency: item.currency , createdAt: convertDate(item.created * 1000), amountReceived: item.amount_received});
             }
         }
+    }
+
+    if (params.hotel) {
+        paymentData = paymentData.filter((item) => item.hotelId === params.hotel);
     }
 
     return paymentData;

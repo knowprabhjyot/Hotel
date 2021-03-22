@@ -5,7 +5,7 @@ const authorize = require('../helpers/authorize')
 const Role = require('../helpers/role');
 
 // routes
-router.get('/', authorize(Role.ADMIN), getAll); // admin only
+router.get('/', authorize(), getAll); // admin only
 router.post('/', authorize(Role.ADMIN), createHotel); // admin only
 router.put('/:id', authorize(Role.ADMIN), updateHotel);
 router.delete('/:id', authorize(Role.ADMIN), deleteHotel);

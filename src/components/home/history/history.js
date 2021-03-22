@@ -1,6 +1,6 @@
 import { Box, Button, CircularProgress, FormControl, Grid, InputLabel, makeStyles, MenuItem, Paper, Select, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TextField, Typography } from '@material-ui/core';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import MuiAlert from '@material-ui/lab/Alert';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
@@ -9,6 +9,7 @@ import { useHistory } from 'react-router';
 import { DateRangePicker } from "materialui-daterange-picker";
 import jsPDF from 'jspdf'
 import 'jspdf-autotable';
+import { AuthContext } from '../../../context/authContext';
 
 const HistoryComponent = () => {
     const [paymentHistory, setPaymentHistory] = useState([]);
@@ -27,6 +28,7 @@ const HistoryComponent = () => {
     const [hotelList, setHotelList] = useState([]);
     const [hotel, setHotel] = useState('');
     const [category, setFilterCategory] = useState('');
+    const authContext  = useContext(AuthContext);
 
     const history = useHistory();
     useEffect(() => {
@@ -218,11 +220,25 @@ const HistoryComponent = () => {
         }
     }
 
-    const filterHistory = async () => {
+    const filterHistoryByDate = async () => {
         setLoading(true);
-        console.log(Math.floor(dateRange.startDate.getTime() / 1000));
         try {
             const response = await axios.get(`${process.env.REACT_APP_API_URL}/payments?limit=${10}&gte=${Math.floor(dateRange.startDate.getTime() / 1000)}&lte=${Math.floor(dateRange.endDate.getTime() / 1000)}`);
+            setPaymentHistory(response.data.data);
+            setLoading(false);
+        } catch (error) {
+            console.log(error);
+            setMessage(error.response.data.message);
+            setOpen(true);
+            setSeverity('error');
+            setLoading(false);
+        }
+    }
+
+    const filterHistoryByHotel = async (e) => {
+        setLoading(true);
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/payments?limit=${10}&hotel=${hotel}`);
             setPaymentHistory(response.data.data);
             setLoading(false);
         } catch (error) {
@@ -275,26 +291,32 @@ const HistoryComponent = () => {
                                                 label="Hotel"
                                             >
                                                 <MenuItem value="">None</MenuItem>
-                                                <MenuItem value={1}>Hotel</MenuItem>
+                                                { authContext.admin ? <MenuItem value={1}>Hotel</MenuItem> : null}
                                                 <MenuItem value={2}>Transaction Date</MenuItem>
                                             </Select>
                                         </FormControl>
 
                                         {
-                                            category === 1 ?
-                                                <FormControl required margin="normal" style={{marginLeft: '30px', width: '200px'}} variant="outlined">
-                                                    <InputLabel required id="Select Hotel">Hotel</InputLabel>
-                                                    <Select
-                                                        labelId="hotel"
-                                                        id="hotel"
-                                                        value={hotel}
-                                                        onChange={(e) => setHotel(e.target.value)}
-                                                        label="Hotel"
-                                                    >
-                                                        <MenuItem value="">None</MenuItem>
-                                                        {displayHotelList()}
-                                                    </Select>
-                                                </FormControl> : null
+                                            category === 1 && authContext.admin ?
+                                                <Box display="flex" alignItems="center" >
+                                                    <FormControl required margin="normal" style={{ marginLeft: '30px', width: '200px' }} variant="outlined">
+                                                        <InputLabel required id="Select Hotel">Hotel</InputLabel>
+                                                        <Select
+                                                            labelId="hotel"
+                                                            id="hotel"
+                                                            value={hotel}
+                                                            onChange={(e) => setHotel(e.target.value)}
+                                                            label="Hotel"
+                                                        >
+                                                            <MenuItem value="">None</MenuItem>
+                                                            {displayHotelList()}
+                                                        </Select>
+                                                    </FormControl>
+                                                    <Button onClick={filterHistoryByHotel} disabled={hotel.length === 0} style={{ marginLeft: '16px' }} variant="contained" color="primary">
+                                                        Filter
+                                                    </Button>
+                                                </Box>
+                                                : null
                                         }
                                         {
                                             category === 2 ?
@@ -313,8 +335,8 @@ const HistoryComponent = () => {
                                                         onFocus={e => setOpenDate(!openDate)}
                                                         onClick={e => setOpenDate(!openDate)}
                                                     />
-                                                    <Button onClick={filterHistory} disabled={!dateRange} style={{ marginLeft: '16px' }} variant="contained" color="primary">
-                                                        Filter Date
+                                                    <Button onClick={filterHistoryByDate} disabled={!dateRange} style={{ marginLeft: '16px' }} variant="contained" color="primary">
+                                                        Filter
                                             </Button>
                                                 </Box>
 
